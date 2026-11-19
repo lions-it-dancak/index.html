@@ -1,1365 +1,1026 @@
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>George Business — Přehled</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>KurvaBank</title>
+<style>
+  /*
+    Layout concept: phone-width shell (max 440px), hash-routed screens
+    swapped via [hidden]. Sticky top bar + fixed bottom tab bar on the
+    authenticated screens. Login/registrace run full-bleed, no chrome,
+    to read as a distinct "outside the app" moment. Cards use three
+    visibly different physical materials (brushed graphite, frosted
+    glass "virtual", brushed gold metal) instead of one reused template.
+  */
+  :root {
+    --bg: #F6F4EF;
+    --surface: #FFFFFF;
+    --surface-2: #EFEAE0;
+    --ink: #15241F;
+    --ink-dim: #5B6B64;
+    --line: #DED8C9;
+    --primary: #0E3B32;
+    --primary-ink: #F6F4EF;
+    --accent: #C98A2C;
+    --accent-ink: #1A1300;
+    --good: #2F7D4F;
+    --bad: #B4402A;
+    --overlay: rgba(10, 18, 15, 0.55);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0D1613; --surface: #16221D; --surface-2: #1D2B25;
+      --ink: #EDF2EF; --ink-dim: #93A69D; --line: #28382F;
+      --primary: #1E7A64; --primary-ink: #0A1512;
+      --accent: #E0A94C; --accent-ink: #1A1300;
+      --good: #4FAE78; --bad: #E0725B;
+      --overlay: rgba(0,0,0,0.6);
+      color-scheme: dark;
     }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0D1613; --surface: #16221D; --surface-2: #1D2B25;
+    --ink: #EDF2EF; --ink-dim: #93A69D; --line: #28382F;
+    --primary: #1E7A64; --primary-ink: #0A1512;
+    --accent: #E0A94C; --accent-ink: #1A1300;
+    --good: #4FAE78; --bad: #E0725B;
+    --overlay: rgba(0,0,0,0.6);
+    color-scheme: dark;
+  }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #DCE2EC;
-      margin: 0;
-      padding: 0;
-      color: #122236;
-      overscroll-behavior-y: none;
-    }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Inter", -apple-system, system-ui, sans-serif;
+    display: flex; justify-content: center;
+  }
+  h1, h2, h3, .display {
+    font-family: "Space Grotesk", "Inter", sans-serif;
+    text-wrap: balance; margin: 0;
+  }
+  p { margin: 0; }
 
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+  #app {
+    width: 100%; max-width: 440px; min-height: 100%;
+    position: relative; display: flex; flex-direction: column;
+    background: var(--bg);
+  }
 
-    /* Official Česká spořitelna George Business superscript haléře */
-    .czk-sup {
-      font-size: 0.56em;
-      font-weight: 600;
-      vertical-align: super;
-      line-height: 0;
-      margin-left: 1px;
-    }
+  /* ---------- top bar ---------- */
+  .topbar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: var(--primary); color: var(--primary-ink);
+    padding-block: 14px;
+    padding-left: max(18px, env(safe-area-inset-left, 0px));
+    padding-right: max(18px, env(safe-area-inset-right, 0px));
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--primary);
+  }
+  .topbar .wordmark { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.01em; }
+  .topbar .wordmark small {
+    display: block; font-family: "Inter", sans-serif; font-weight: 400; font-size: 0.65rem;
+    opacity: 0.75; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 999px; flex: 0 0 auto;
+    border: 1px solid color-mix(in srgb, var(--primary-ink) 25%, transparent);
+    background: color-mix(in srgb, var(--primary-ink) 12%, transparent);
+    color: var(--primary-ink); display: grid; place-items: center; cursor: pointer;
+    position: relative;
+  }
+  .icon-btn .dot-badge {
+    position: absolute; top: -2px; right: -2px; width: 9px; height: 9px;
+    border-radius: 999px; background: var(--bad); border: 2px solid var(--primary);
+  }
 
-    .czk-unit {
-      font-size: 0.85em;
-      font-weight: 600;
-      margin-left: 4px;
-    }
+  /* ---------- scroll area ---------- */
+  .screen {
+    flex: 1;
+    padding-left: max(18px, env(safe-area-inset-left, 0px));
+    padding-right: max(18px, env(safe-area-inset-right, 0px));
+    padding-block: 18px 104px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
 
-    /* Corporate George Business card surface */
-    .gb-card {
-      background: #FFFFFF;
-      border-radius: 14px;
-      border: 1px solid #E2E7EE;
-      box-shadow: 0 1px 2px rgba(18, 34, 54, 0.04);
-      position: relative;
-    }
+  /* ---------- cards & primitives ---------- */
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 18px; padding: 18px;
+  }
+  .balance-card {
+    background: linear-gradient(155deg, var(--primary), color-mix(in srgb, var(--primary) 70%, black));
+    color: var(--primary-ink); border-radius: 20px; padding: 22px;
+    display: flex; flex-direction: column; gap: 14px;
+    position: relative; overflow: hidden; border: none;
+  }
+  .balance-card::after {
+    content: ""; position: absolute; right: -40px; top: -40px;
+    width: 160px; height: 160px; border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 35%, transparent); filter: blur(2px);
+  }
+  .balance-card .label { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+  .balance-card .amount { font-family: "Space Grotesk", sans-serif; font-size: 2.1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .balance-card .iban { font-size: 0.78rem; opacity: 0.85; font-variant-numeric: tabular-nums; }
 
-    /* Deep corporate Česká spořitelna navy-blue header gradient */
-    .gb-header {
-      background: linear-gradient(180deg, #003781 0%, #0049A8 100%);
-    }
+  .chip-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; }
+  .chip { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 64px; background: none; border: none; font: inherit; cursor: pointer; color: inherit; }
+  .chip .ico {
+    width: 48px; height: 48px; border-radius: 16px; background: var(--surface);
+    border: 1px solid var(--line); display: grid; place-items: center; color: var(--primary);
+  }
+  .chip span { font-size: 0.7rem; color: var(--ink-dim); text-align: center; }
 
-    /* Mobile app shell */
-    .app-shell {
-      width: 100%;
-      max-width: 430px;
-      min-height: 100dvh;
-      height: 100dvh;
-      background-color: #F4F6F9;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-    }
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; }
+  .section-title h2 { font-size: 1rem; }
+  .section-title a, .section-title button.linklike {
+    font-size: 0.8rem; color: var(--primary); text-decoration: none;
+    background: none; border: none; font-family: inherit; cursor: pointer; padding: 0;
+  }
 
-    @media (min-width: 480px) {
-      body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 16px 0;
-      }
-      .app-shell {
-        height: 860px;
-        min-height: 860px;
-        max-height: 94vh;
-        border-radius: 32px;
-        box-shadow: 0 24px 60px rgba(0, 55, 129, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.7);
-      }
-    }
+  .tx { display: flex; align-items: center; gap: 12px; padding-block: 12px; border-bottom: 1px solid var(--line); }
+  .tx:last-child { border-bottom: none; }
+  .tx .dot {
+    width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--surface-2); color: var(--primary); flex: 0 0 auto; font-size: 1rem;
+  }
+  .tx .meta { flex: 1; min-width: 0; }
+  .tx .meta .who { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tx .meta .when { font-size: 0.75rem; color: var(--ink-dim); }
+  .tx .amt { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .tx .amt.neg { color: var(--ink); }
+  .tx .amt.pos { color: var(--good); }
 
-    @keyframes fadeSlideUp {
-      from {
-        opacity: 0;
-        transform: translate(-50%, 10px);
-      }
-      to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-      }
-    }
-    .toast-anim {
-      animation: fadeSlideUp 0.2s ease-out forwards;
-    }
-  </style>
-</head>
-<body>
+  label.field { display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--ink-dim); }
+  input, select {
+    font: inherit; font-size: 0.95rem; color: var(--ink); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; width: 100%;
+  }
+  input:focus, select:focus, button:focus-visible, .icon-btn:focus-visible, .tab:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
 
-  <div class="app-shell" id="appShell">
+  .btn {
+    appearance: none; border: none; border-radius: 14px; padding: 14px 18px;
+    font: inherit; font-weight: 600; font-size: 0.95rem; cursor: pointer; text-align: center;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-ghost { background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); }
+  .btn-danger { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .btn { flex: 1; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    <!-- =================================================================== -->
-    <!-- VIEW 1: PŘEHLED (George Business Corporate Overview)                 -->
-    <!-- =================================================================== -->
-    <div id="view-prehled" class="flex flex-col h-full w-full">
-      
-      <!-- Corporate Navy Header -->
-      <header class="gb-header text-white px-5 pt-4 pb-5 shrink-0 z-20 rounded-b-[20px] shadow-sm">
-        <!-- Top Utility Row: Company Switcher + Action Icons -->
-        <div class="flex items-center justify-between mb-3.5">
-          <!-- Entity / Company Switcher Pill -->
-          <button type="button" onclick="showToast('Pracovní prostor: ' + appState.companyName)"
-            class="flex items-center space-x-2 bg-white/12 hover:bg-white/20 active:bg-white/25 border border-white/15 rounded-full pl-2.5 pr-3 py-1.5 transition">
-            <div class="w-5 h-5 rounded-full bg-white text-[#003781] flex items-center justify-center shrink-0">
-              <!-- Stylized George 'g' emblem -->
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                <circle cx="11.5" cy="10" r="4.5" stroke="#003781" stroke-width="2.6"/>
-                <path d="M16 10v4.5c0 2.5-1.8 4.2-4.3 4.2" stroke="#003781" stroke-width="2.6" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span id="headerCompanyName" class="text-[12.5px] font-semibold tracking-[-0.01em] truncate max-w-[175px]">TARANT s.r.o.</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="opacity-80">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
+  /* ---------- bottom tabs ---------- */
+  .tabs {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 440px; display: flex; justify-content: space-around;
+    background: var(--surface); border-top: 1px solid var(--line);
+    padding-top: 8px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: max(8px, env(safe-area-inset-right, 0px));
+    z-index: 10;
+  }
+  .tab {
+    appearance: none; border: none; background: none;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font: inherit; font-size: 0.63rem; color: var(--ink-dim); cursor: pointer; flex: 1; padding: 4px;
+  }
+  .tab[aria-current="true"] { color: var(--primary); }
+  .tab svg { width: 22px; height: 22px; }
 
-          <!-- Right Header Actions: Search, Notifications, Profile -->
-          <div class="flex items-center space-x-3">
-            <button type="button" onclick="showToast('Fulltextové vyhledávání George Business')" aria-label="Hledat"
-              class="p-1.5 rounded-full hover:bg-white/12 active:bg-white/20 transition">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="7.5"></circle>
-                <line x1="20.5" y1="20.5" x2="16.35" y2="16.35"></line>
-              </svg>
-            </button>
+  /* ---------- login / onboarding (full bleed, no chrome) ---------- */
+  .onboard-screen {
+    min-height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    gap: 24px; padding: 32px max(24px, env(safe-area-inset-left, 0px)) calc(32px + env(safe-area-inset-bottom,0px)) max(24px, env(safe-area-inset-right, 0px));
+    background: var(--primary);
+  }
+  .onboard-screen .brand { text-align: center; color: var(--primary-ink); }
+  .onboard-screen .brand .mark {
+    width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 18px;
+    background: var(--accent); color: var(--accent-ink); display: grid; place-items: center;
+    font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.5rem;
+  }
+  .onboard-screen .brand h1 { font-size: 1.4rem; }
+  .onboard-screen .brand p { color: color-mix(in srgb, var(--primary-ink) 75%, transparent); font-size: 0.85rem; margin-top: 6px; }
+  .onboard-screen .card { width: 100%; max-width: 360px; }
+  .onboard-screen .fine { font-size: 0.72rem; color: color-mix(in srgb, var(--primary-ink) 65%, transparent); text-align: center; }
+  .onboard-link {
+    background: none; border: none; color: var(--primary-ink); text-decoration: underline;
+    font: inherit; font-size: 0.85rem; cursor: pointer; padding: 0;
+  }
 
-            <button type="button" onclick="switchTab('pokyny')" aria-label="Oznámení a pokyny"
-              class="p-1.5 rounded-full hover:bg-white/12 active:bg-white/20 transition relative">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              <span id="bellDot" class="hidden w-2 h-2 rounded-full bg-[#FF4D4F] ring-2 ring-[#003E92] absolute top-1.5 right-1.5"></span>
-            </button>
+  .steps { display: flex; gap: 6px; width: 100%; max-width: 360px; }
+  .steps span { flex: 1; height: 4px; border-radius: 999px; background: color-mix(in srgb, var(--primary-ink) 20%, transparent); }
+  .steps span.done { background: var(--accent); }
 
-            <button type="button" onclick="switchTab('menu')" aria-label="Profil a nastavení"
-              class="p-1.5 rounded-full hover:bg-white/12 active:bg-white/20 transition">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="8" r="3.8"></circle>
-                <path d="M5 19.5c0-3.5 3.1-6 7-6s7 2.5 7 6"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
+  .otp-row { display: flex; gap: 8px; justify-content: center; }
+  .otp-row input {
+    width: 42px; height: 52px; text-align: center; font-size: 1.2rem; font-weight: 700; padding: 0;
+  }
 
-        <!-- Screen Title & Total Corporate Balance -->
-        <div class="flex items-end justify-between pt-0.5">
-          <div>
-            <h1 class="text-[24px] font-bold tracking-[-0.02em] leading-tight">Přehled</h1>
-            <p class="text-[11.5px] text-white/75 mt-1 font-medium">Celkový účetní zůstatek v CZK</p>
-          </div>
-          <div class="text-right">
-            <div id="totalCorporateBalance" class="text-[22px] font-bold tracking-[-0.02em] leading-none">
-              0,<span class="czk-sup">00</span><span class="czk-unit">Kč</span>
-            </div>
-          </div>
-        </div>
-      </header>
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 0.65rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent);
+    border: none; font-family: inherit; cursor: pointer;
+  }
+  .badge.muted { background: var(--surface-2); color: var(--ink-dim); }
+  .badge.on { background: color-mix(in srgb, var(--good) 20%, transparent); color: var(--good); }
+  .badge.off { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); }
 
-      <!-- Scrollable Overview Body -->
-      <main class="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-24 space-y-5">
-        
-        <!-- Section: Účty -->
-        <section>
-          <div class="flex items-center justify-between px-1 mb-2.5">
-            <div class="flex items-center space-x-2">
-              <h2 class="text-[14px] font-semibold text-[#122236] tracking-[-0.01em]">Účty</h2>
-              <span class="text-[11px] font-semibold text-[#5A6B82] bg-[#E6ECF4] px-2 py-0.5 rounded-full">3</span>
-            </div>
-            <button type="button" onclick="switchTab('menu')" class="text-[12px] font-medium text-[#0049A8] hover:underline flex items-center space-x-1">
-              <span>Upravit částky</span>
-            </button>
-          </div>
+  .qr-box {
+    width: 220px; height: 220px; margin-inline: auto; border-radius: 18px;
+    background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center;
+  }
 
-          <div class="space-y-2.5" id="overviewAccountsContainer">
-            <!-- Account cards rendered dynamically -->
-          </div>
-        </section>
+  .contact-row { display: flex; align-items: center; gap: 12px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+  .contact-row:last-child { border-bottom: none; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 999px; background: var(--surface-2); color: var(--primary);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.85rem; flex: 0 0 auto;
+  }
 
-        <!-- Section: Karty -->
-        <section>
-          <div class="flex items-center justify-between px-1 mb-2.5">
-            <div class="flex items-center space-x-2">
-              <h2 class="text-[14px] font-semibold text-[#122236] tracking-[-0.01em]">Karty</h2>
-              <span class="text-[11px] font-semibold text-[#5A6B82] bg-[#E6ECF4] px-2 py-0.5 rounded-full">1</span>
-            </div>
-          </div>
+  .profile-row { display: flex; align-items: center; justify-content: space-between; padding-block: 12px; border-bottom: 1px solid var(--line); font-size: 0.9rem; width: 100%; background: none; border: none; font-family: inherit; color: var(--ink); cursor: pointer; text-align: left; }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row .k { color: var(--ink-dim); font-size: 0.8rem; }
+  .profile-row .right { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); }
 
-          <div onclick="openCardModal()" class="gb-card p-3.5 flex items-center justify-between cursor-pointer active:bg-[#F9FBFD] transition">
-            <div class="flex items-center space-x-3">
-              <!-- Corporate Visa Business Mini Card Visual -->
-              <div class="w-12 h-8 rounded-md bg-gradient-to-br from-[#003781] to-[#0058CC] text-white p-1.5 flex flex-col justify-between shrink-0 shadow-xs">
-                <div class="w-2.5 h-1.5 rounded-[1px] bg-[#E6C36A]"></div>
-                <div class="text-[7px] font-bold tracking-wider text-right opacity-90">VISA</div>
-              </div>
-              <div>
-                <div class="text-[14px] font-semibold text-[#122236] leading-snug">Firemní karta Visa Business</div>
-                <div class="text-[12px] text-[#5A6B82] flex items-center space-x-1.5 mt-0.5">
-                  <span>•••• 4821</span>
-                  <span>•</span>
-                  <span class="inline-flex items-center text-[#137333] font-medium">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#137333] mr-1"></span>Aktivní
-                  </span>
-                </div>
-              </div>
-            </div>
+  /* ---------- toggle switch ---------- */
+  .switch { position: relative; width: 44px; height: 26px; flex: 0 0 auto; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .switch .track {
+    position: absolute; inset: 0; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); transition: background .15s;
+  }
+  .switch .knob {
+    position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 999px;
+    background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .15s;
+  }
+  .switch input:checked + .track { background: var(--primary); border-color: var(--primary); }
+  .switch input:checked + .track + .knob { transform: translateX(18px); background: var(--primary-ink); }
 
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5A6B82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </section>
+  /* ---------- card carousel ---------- */
+  .card-scroller { display: flex; gap: 14px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x mandatory; }
+  .bank-card {
+    flex: 0 0 272px; height: 172px; border-radius: 20px; padding: 18px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden; scroll-snap-align: start; cursor: pointer;
+    color: #fff;
+  }
+  .bank-card.frozen { filter: grayscale(0.7) brightness(0.75); }
+  .bank-card .bc-top { display: flex; justify-content: space-between; align-items: flex-start; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.85; }
+  .bank-card .bc-num { font-family: "Space Grotesk", sans-serif; font-size: 1.05rem; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
+  .bank-card .bc-bottom { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.7rem; }
+  .bank-card .bc-holder { text-transform: uppercase; letter-spacing: 0.04em; }
+  .bank-card .bc-logo { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1rem; }
+  .bank-card .chip-ico {
+    width: 34px; height: 24px; border-radius: 5px;
+    background: linear-gradient(145deg, #e9d79a, #b8964f); position: relative;
+  }
+  .bank-card .frozen-flag {
+    position: absolute; top: 10px; right: 10px; font-size: 0.6rem; background: rgba(0,0,0,0.5);
+    padding: 3px 8px; border-radius: 999px; letter-spacing: 0.05em;
+  }
 
-      </main>
+  .bank-card.style-graphite {
+    background:
+      radial-gradient(120% 140% at 10% 0%, rgba(255,255,255,0.12), transparent 60%),
+      linear-gradient(135deg, #2b2f33, #15171a 70%);
+  }
+  .bank-card.style-glass {
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.04)),
+      linear-gradient(160deg, #0E3B32, #09211c);
+    border: 1px solid rgba(255,255,255,0.25);
+    backdrop-filter: blur(2px);
+  }
+  .bank-card.style-gold {
+    background: linear-gradient(135deg, #E6C77A, #9C7A2E 55%, #7A5C1E);
+    color: #2a1f05;
+  }
+  .bank-card.style-gold .chip-ico { background: linear-gradient(145deg, #3a3a3a, #141414); }
+  .bank-card.add-card {
+    border: 2px dashed var(--line); background: var(--surface-2); color: var(--ink-dim);
+    align-items: center; justify-content: center; flex-direction: row; gap: 8px; font-weight: 600;
+  }
+
+  .seg-row { display: flex; gap: 8px; }
+  .seg {
+    flex: 1; text-align: center; padding: 9px; border-radius: 12px; border: 1px solid var(--line);
+    background: var(--surface-2); font-size: 0.78rem; color: var(--ink-dim); cursor: pointer; font: inherit;
+  }
+  .seg[aria-pressed="true"] { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
+
+  .limit-row { display: flex; align-items: center; gap: 10px; }
+  .limit-row button {
+    width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2);
+    color: var(--ink); font-size: 1.1rem; cursor: pointer;
+  }
+  .limit-row .limit-val { flex: 1; text-align: center; font-variant-numeric: tabular-nums; font-weight: 700; }
+
+  /* ---------- modal sheet ---------- */
+  .sheet-wrap {
+    position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center;
+  }
+  .sheet-wrap[hidden] { display: none; }
+  .sheet-backdrop { position: absolute; inset: 0; background: var(--overlay); }
+  .sheet {
+    position: relative; width: 100%; max-width: 440px; background: var(--surface);
+    border-radius: 22px 22px 0 0; padding: 20px max(20px, env(safe-area-inset-left,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px, env(safe-area-inset-right,0px));
+    display: flex; flex-direction: column; gap: 14px; max-height: 82vh; overflow-y: auto;
+  }
+  .sheet .handle { width: 36px; height: 4px; border-radius: 999px; background: var(--line); margin: 0 auto 4px; }
+
+  .toast-wrap {
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(96px + env(safe-area-inset-bottom,0px));
+    z-index: 60; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 400px; padding-inline: 16px; pointer-events: none;
+  }
+  .toast {
+    background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: 12px; font-size: 0.85rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 8px;
+  }
+
+  .notif-row { display: flex; gap: 12px; padding-block: 12px; border-bottom: 1px solid var(--line); }
+  .notif-row:last-child { border-bottom: none; }
+  .notif-row .dot { width: 34px; height: 34px; border-radius: 10px; background: var(--surface-2); color: var(--primary); display: grid; place-items: center; flex: 0 0 auto; }
+  .notif-row.unread { background: color-mix(in srgb, var(--accent) 6%, transparent); margin-inline: -18px; padding-inline: 18px; }
+
+  [hidden] { display: none !important; }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap">
+
+<div id="app">
+
+  <!-- LOGIN -->
+  <section id="screen-login" class="onboard-screen">
+    <div class="brand">
+      <div class="mark">KB</div>
+      <h1>KurvaBank</h1>
+      <p>Přihlášení do internetového bankovnictví</p>
     </div>
+    <form class="card" id="login-form">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <label class="field">Klientské číslo
+          <input id="login-user" type="text" inputmode="numeric" placeholder="0000 0000" value="4821 1193" required>
+        </label>
+        <label class="field">PIN
+          <input type="password" inputmode="numeric" placeholder="••••" maxlength="4" value="4821" required>
+        </label>
+        <button class="btn btn-primary" type="submit">Přihlásit se</button>
+        <button class="btn btn-ghost" type="button" id="login-biometric">Přihlásit otiskem prstu</button>
+      </div>
+    </form>
+    <button class="onboard-link" data-nav="register-1">Nemáte účet? Založit si ho</button>
+    <p class="fine">Školní projekt (maketa) · fiktivní údaje · nejde o skutečnou bankovní službu</p>
+  </section>
 
+  <!-- REGISTER STEP 1 -->
+  <section id="screen-register-1" class="onboard-screen" hidden>
+    <div class="steps"><span class="done"></span><span></span><span></span><span></span></div>
+    <div class="brand"><h1>Založení účtu</h1><p>Krok 1 ze 4 · osobní údaje</p></div>
+    <form class="card" id="reg1-form">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <label class="field">Jméno a příjmení
+          <input type="text" placeholder="Jan Novák" required>
+        </label>
+        <label class="field">Rodné číslo
+          <input type="text" inputmode="numeric" placeholder="900101/1234" required>
+        </label>
+        <label class="field">E-mail
+          <input type="email" placeholder="jan.novak@email.cz" required>
+        </label>
+        <button class="btn btn-primary" type="submit">Pokračovat</button>
+      </div>
+    </form>
+    <button class="onboard-link" data-nav="login">Zpět na přihlášení</button>
+  </section>
 
-    <!-- =================================================================== -->
-    <!-- VIEW 2: POKYNY K POTVRZENÍ (Pending Instructions & Authorizations)  -->
-    <!-- =================================================================== -->
-    <div id="view-pokyny" class="hidden flex-col h-full w-full">
-      
-      <!-- Corporate Navy Header -->
-      <header class="gb-header text-white px-5 pt-4 pb-4 shrink-0 z-20">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-[11.5px] text-white/75 font-medium" id="pokynyCompanyLabel">TARANT s.r.o.</div>
-            <h1 class="text-[21px] font-bold tracking-[-0.01em] mt-0.5">Pokyny k potvrzení</h1>
-          </div>
-          <button type="button" onclick="addSampleInstruction()"
-            class="text-[12px] font-semibold bg-white/15 hover:bg-white/25 active:bg-white/30 border border-white/20 px-3 py-1.5 rounded-full transition">
-            + Nový pokyn
-          </button>
+  <!-- REGISTER STEP 2: phone + OTP -->
+  <section id="screen-register-2" class="onboard-screen" hidden>
+    <div class="steps"><span class="done"></span><span class="done"></span><span></span><span></span></div>
+    <div class="brand"><h1>Ověření telefonu</h1><p>Krok 2 ze 4 · zadejte kód z SMS</p></div>
+    <form class="card" id="reg2-form" style="align-items:center;">
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center;">
+        <label class="field" style="width:100%;">Telefonní číslo
+          <input type="tel" placeholder="+420 601 234 567" value="+420 601 234 567" required>
+        </label>
+        <p style="font-size:0.8rem; color:var(--ink-dim); text-align:center;">Na toto číslo jsme (fiktivně) odeslali kód <strong>4821</strong></p>
+        <div class="otp-row">
+          <input inputmode="numeric" maxlength="1" value="4">
+          <input inputmode="numeric" maxlength="1" value="8">
+          <input inputmode="numeric" maxlength="1" value="2">
+          <input inputmode="numeric" maxlength="1" value="1">
         </div>
+        <button class="btn btn-primary" type="submit" style="width:100%;">Ověřit kód</button>
+        <button class="btn btn-ghost" type="button" style="width:100%;">Odeslat kód znovu</button>
+      </div>
+    </form>
+  </section>
 
-        <!-- Segmented Sub-tabs: K podpisu | Čekající | Provedené -->
-        <div class="mt-3.5 bg-[#002963]/70 p-1 rounded-xl grid grid-cols-3 gap-1">
-          <button type="button" id="subtab-pending" onclick="setPokynyFilter('pending')"
-            class="py-1.5 px-2 rounded-lg text-[12px] font-semibold bg-white text-[#003781] shadow-xs transition">
-            K podpisu (<span id="count-pending">0</span>)
-          </button>
-          <button type="button" id="subtab-waiting" onclick="setPokynyFilter('waiting')"
-            class="py-1.5 px-2 rounded-lg text-[12px] font-medium text-white/85 hover:text-white transition">
-            Čekající (0)
-          </button>
-          <button type="button" id="subtab-done" onclick="setPokynyFilter('done')"
-            class="py-1.5 px-2 rounded-lg text-[12px] font-medium text-white/85 hover:text-white transition">
-            Provedené (<span id="count-done">0</span>)
-          </button>
-        </div>
-      </header>
+  <!-- REGISTER STEP 3: set PIN -->
+  <section id="screen-register-3" class="onboard-screen" hidden>
+    <div class="steps"><span class="done"></span><span class="done"></span><span class="done"></span><span></span></div>
+    <div class="brand"><h1>Nastavení PIN</h1><p>Krok 3 ze 4 · zabezpečení účtu</p></div>
+    <form class="card" id="reg3-form" style="align-items:center;">
+      <div style="display:flex; flex-direction:column; gap:16px; align-items:center; width:100%;">
+        <label class="field" style="width:100%;">Zvolte si čtyřmístný PIN
+          <input type="password" inputmode="numeric" maxlength="4" placeholder="••••" required>
+        </label>
+        <label class="field" style="width:100%;">Potvrďte PIN
+          <input type="password" inputmode="numeric" maxlength="4" placeholder="••••" required>
+        </label>
+        <label style="display:flex; align-items:center; gap:10px; font-size:0.85rem; color:var(--ink-dim); width:100%;">
+          <input type="checkbox" style="width:auto;" checked>
+          Souhlasím s obchodními podmínkami (fiktivní)
+        </label>
+        <button class="btn btn-primary" type="submit" style="width:100%;">Dokončit založení</button>
+      </div>
+    </form>
+  </section>
 
-      <!-- Scrollable Instructions List -->
-      <main class="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-24" id="pokynyListContainer">
-        <!-- Rendered dynamically -->
-      </main>
+  <!-- REGISTER STEP 4: success -->
+  <section id="screen-register-4" class="onboard-screen" hidden>
+    <div class="steps"><span class="done"></span><span class="done"></span><span class="done"></span><span class="done"></span></div>
+    <div class="card" style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px;">
+      <div style="width:64px; height:64px; border-radius:999px; background:color-mix(in srgb, var(--good) 18%, transparent); color:var(--good); display:grid; place-items:center;">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h3>Účet byl založen</h3>
+      <p style="color:var(--ink-dim); font-size:0.85rem;">Číslo účtu <strong>2165899412/9999</strong> je připraveno k použití.</p>
+      <button class="btn btn-primary" type="button" data-nav="home" style="width:100%;">Přejít do bankovnictví</button>
     </div>
+  </section>
 
-
-    <!-- =================================================================== -->
-    <!-- VIEW 3: MENU (George Business Menu + File Config + Balance Editor)  -->
-    <!-- =================================================================== -->
-    <div id="view-menu" class="hidden flex-col h-full w-full">
-      
-      <!-- Corporate Navy Header -->
-      <header class="gb-header text-white px-5 pt-4 pb-4 shrink-0 z-20">
-        <div class="flex items-center justify-between">
-          <h1 class="text-[21px] font-bold tracking-[-0.01em]">Menu</h1>
-          <span class="text-[11px] font-medium bg-white/15 px-2.5 py-1 rounded-full">George Business</span>
-        </div>
-      </header>
-
-      <!-- Scrollable Menu & Config Content -->
-      <main class="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-24 space-y-4">
-        
-        <!-- Corporate User Profile Card -->
-        <div class="gb-card p-4 flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="w-11 h-11 rounded-full bg-[#E6EFFC] text-[#003781] font-bold text-[15px] flex items-center justify-center shrink-0">
-              VT
-            </div>
-            <div>
-              <div class="text-[15px] font-bold text-[#122236]">Václav Tarant</div>
-              <div class="text-[12px] text-[#5A6B82]"><span id="menuCompanyName">TARANT s.r.o.</span> • IČO: 08472910</div>
-            </div>
-          </div>
-          <span class="text-[11px] font-semibold text-[#137333] bg-[#E6F4EA] px-2.5 py-1 rounded-full">Aktivní</span>
-        </div>
-
-        <!-- =============================================================== -->
-        <!-- SECTION A: FILE CONFIGURATION (.JSON / .TXT)                    -->
-        <!-- =============================================================== -->
-        <div class="gb-card p-4 space-y-3">
-          <div class="flex items-start justify-between">
-            <div>
-              <h2 class="text-[14.5px] font-bold text-[#122236]">Nastavení částek ze souboru</h2>
-              <p class="text-[12px] text-[#5A6B82] mt-0.5">Nahrajte <code class="bg-[#F0F3F8] px-1 rounded text-[#003781]">.json</code> nebo <code class="bg-[#F0F3F8] px-1 rounded text-[#003781]">.txt</code> soubor pro okamžité nastavení zůstatků a pokynů.</p>
-            </div>
-          </div>
-
-          <!-- Upload & Download Template Buttons -->
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <label class="cursor-pointer bg-[#0049A8] hover:bg-[#003781] active:scale-[0.99] text-white text-[12.5px] font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center space-x-1.5 transition shadow-xs">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-              <span>Nahrát soubor</span>
-              <input type="file" id="configFileInput" accept=".json,.txt,application/json,text/plain" class="hidden" onchange="handleConfigFileUpload(event)" />
-            </label>
-
-            <button type="button" onclick="downloadTemplateJSON()"
-              class="bg-[#EEF3FA] hover:bg-[#E1EAF7] active:scale-[0.99] text-[#003781] text-[12.5px] font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center space-x-1.5 transition">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              <span>Stáhnout JSON</span>
-            </button>
-          </div>
-
-          <!-- Toggle Inline JSON Editor -->
-          <div class="pt-1 border-t border-[#EDF1F7]">
-            <button type="button" onclick="toggleInlineJsonEditor()" class="w-full flex items-center justify-between text-[12.5px] font-semibold text-[#0049A8] py-1">
-              <span>Upravit JSON konfiguraci přímo</span>
-              <svg id="jsonEditorChevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
-
-            <div id="inlineJsonWrapper" class="hidden mt-2 space-y-2">
-              <textarea id="inlineJsonTextarea" rows="8" spellcheck="false"
-                class="w-full font-mono text-[11.5px] leading-relaxed bg-[#F8FAFC] border border-[#D5DCE6] focus:border-[#0049A8] rounded-xl p-2.5 text-[#122236] outline-none"></textarea>
-              <button type="button" onclick="applyInlineJson()"
-                class="w-full bg-[#122236] hover:bg-[#1E3552] text-white text-[12.5px] font-semibold py-2 rounded-xl transition">
-                Použít JSON nastavení
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- =============================================================== -->
-        <!-- SECTION B: MANUAL BALANCE EDITOR (+ PŘIČÍST / = NASTAVIT)       -->
-        <!-- =============================================================== -->
-        <div class="gb-card p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-[14.5px] font-bold text-[#122236]">Rychlá úprava zůstatků</h2>
-            <button type="button" onclick="resetAllBalances()" class="text-[11.5px] font-semibold text-[#C5221F] hover:underline">
-              Vynulovat vše (0,00 Kč)
-            </button>
-          </div>
-
-          <!-- Mode Toggle -->
-          <div class="bg-[#F0F3F8] p-1 rounded-xl grid grid-cols-2 gap-1">
-            <button type="button" id="btnModeAdd" onclick="setEditorMode('add')"
-              class="py-1.5 px-2.5 rounded-lg text-[12px] font-semibold bg-[#0049A8] text-white shadow-xs transition">
-              + Přičíst částku
-            </button>
-            <button type="button" id="btnModeSet" onclick="setEditorMode('set')"
-              class="py-1.5 px-2.5 rounded-lg text-[12px] font-semibold text-[#5A6B82] hover:text-[#122236] transition">
-              = Nastavit přesně
-            </button>
-          </div>
-
-          <!-- Account Editor Inputs Container -->
-          <div id="menuAccountEditors" class="space-y-3 pt-1">
-            <!-- Rendered dynamically -->
-          </div>
-
-          <button type="button" onclick="saveManualInputsAndGoOverview()"
-            class="w-full py-2.5 rounded-xl bg-[#0049A8] hover:bg-[#003781] active:scale-[0.99] text-white font-semibold text-[13.5px] transition shadow-xs mt-1">
-            Uložit změny a zobrazit Přehled
-          </button>
-        </div>
-
-        <!-- =============================================================== -->
-        <!-- SECTION C: AUTHENTIC GEORGE BUSINESS MENU ITEMS                 -->
-        <!-- =============================================================== -->
-        <div class="gb-card divide-y divide-[#EDF1F7] overflow-hidden">
-          <button type="button" onclick="showToast('Zprávy z banky: Žádné nové zprávy')" class="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#F8FAFC] transition text-left">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-lg bg-[#EEF3FA] text-[#0049A8] flex items-center justify-center">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                  <polyline points="22,6 12,13 2,6"></polyline>
-                </svg>
-              </div>
-              <span class="text-[13.5px] font-medium text-[#122236]">Zprávy z banky</span>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A6B82" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
-
-          <button type="button" onclick="showToast('Nastavení notifikací: Push oznámení zapnuta')" class="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#F8FAFC] transition text-left">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-lg bg-[#EEF3FA] text-[#0049A8] flex items-center justify-center">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-              </div>
-              <span class="text-[13.5px] font-medium text-[#122236]">Nastavení notifikací</span>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A6B82" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
-
-          <button type="button" onclick="showToast('Správa zařízení: Toto zařízení (Aktivní)')" class="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#F8FAFC] transition text-left">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-lg bg-[#EEF3FA] text-[#0049A8] flex items-center justify-center">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                </svg>
-              </div>
-              <span class="text-[13.5px] font-medium text-[#122236]">Správa zařízení</span>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A6B82" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
-
-          <button type="button" onclick="showToast('Kontaktní údaje: tarant@tarant-business.cz')" class="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[#F8FAFC] transition text-left">
-            <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 rounded-lg bg-[#EEF3FA] text-[#0049A8] flex items-center justify-center">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
-              <span class="text-[13.5px] font-medium text-[#122236]">Kontaktní údaje</span>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5A6B82" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
-        </div>
-
-      </main>
+  <!-- HOME -->
+  <section id="screen-home" class="app-screen" hidden>
+    <div class="topbar">
+      <div class="wordmark">KurvaBank<small>Běžný účet</small></div>
+      <button class="icon-btn" data-nav="notifications" aria-label="Oznámení">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+        <span class="dot-badge" id="notif-dot"></span>
+      </button>
     </div>
-
-
-    <!-- =================================================================== -->
-    <!-- BOTTOM NAVIGATION BAR (Strictly 3 Official George Business Tabs)     -->
-    <!-- =================================================================== -->
-    <nav class="bg-white border-t border-[#E2E7EE] px-2 pt-1.5 pb-2.5 flex items-center justify-around shrink-0 z-30">
-      
-      <!-- Tab 1: Přehled -->
-      <button type="button" id="nav-prehled" onclick="switchTab('prehled')" class="flex flex-col items-center justify-center w-1/3 py-0.5 transition">
-        <div id="nav-pill-prehled" class="w-14 h-7 rounded-full bg-[#E6EFFC] flex items-center justify-center mb-0.5 transition">
-          <svg id="nav-icon-prehled" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0049A8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
-            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-          </svg>
+    <div class="screen">
+      <div class="balance-card">
+        <div class="label">Dostupný zůstatek</div>
+        <div class="amount" id="home-balance">84 230,50 Kč</div>
+        <div class="iban">2165899412/9999 · CZ65 9999 0000 1920 0014 5399</div>
+        <div class="btn-row">
+          <button class="btn" style="background: color-mix(in srgb, var(--primary-ink) 16%, transparent); color: var(--primary-ink);" data-nav="transfer">Platba</button>
+          <button class="btn" style="background: color-mix(in srgb, var(--primary-ink) 16%, transparent); color: var(--primary-ink);" data-nav="qr">QR platba</button>
         </div>
-        <span id="nav-label-prehled" class="text-[11px] font-semibold text-[#0049A8]">Přehled</span>
-      </button>
+      </div>
 
-      <!-- Tab 2: Pokyny k potvrzení -->
-      <button type="button" id="nav-pokyny" onclick="switchTab('pokyny')" class="flex flex-col items-center justify-center w-1/3 py-0.5 transition relative">
-        <div id="nav-pill-pokyny" class="w-14 h-7 rounded-full flex items-center justify-center mb-0.5 transition relative">
-          <svg id="nav-icon-pokyny" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#5A6B82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            <polyline points="9 12 11 14 15 10"></polyline>
-          </svg>
-          <span id="navPendingBadge" class="hidden min-w-[16px] h-[16px] px-1 rounded-full bg-[#D93025] text-white text-[10px] font-bold flex items-center justify-center absolute -top-0.5 right-2.5">0</span>
+      <div class="chip-row">
+        <button class="chip" data-nav="transfer">
+          <span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h10M7 7l3-3M7 7l3 3M17 17H7M17 17l-3 3M17 17l-3-3"/></svg></span>
+          <span>Platba</span>
+        </button>
+        <button class="chip" data-nav="qr">
+          <span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM19 19h2v2h-2z"/></svg></span>
+          <span>QR kód</span>
+        </button>
+        <button class="chip" data-nav="cards">
+          <span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span>
+          <span>Karty</span>
+        </button>
+        <button class="chip" data-nav="contacts">
+          <span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="7" r="2.3"/><path d="M15.5 13.2c2.4.3 4.5 2 4.5 4.8"/></svg></span>
+          <span>Podpora</span>
+        </button>
+      </div>
+
+      <div>
+        <div class="section-title">
+          <h2>Moje karty</h2>
+          <button class="linklike" data-nav="cards">Vše →</button>
         </div>
-        <span id="nav-label-pokyny" class="text-[11px] font-medium text-[#5A6B82]">Pokyny k potvrzení</span>
-      </button>
-
-      <!-- Tab 3: Menu -->
-      <button type="button" id="nav-menu" onclick="switchTab('menu')" class="flex flex-col items-center justify-center w-1/3 py-0.5 transition">
-        <div id="nav-pill-menu" class="w-14 h-7 rounded-full flex items-center justify-center mb-0.5 transition">
-          <svg id="nav-icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6B82" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" y1="7" x2="20" y2="7"></line>
-            <line x1="4" y1="12" x2="20" y2="12"></line>
-            <line x1="4" y1="17" x2="20" y2="17"></line>
-          </svg>
-        </div>
-        <span id="nav-label-menu" class="text-[11px] font-medium text-[#5A6B82]">Menu</span>
-      </button>
-
-    </nav>
-
-
-    <!-- =================================================================== -->
-    <!-- MODAL 1: GEORGE BUSINESS ACCOUNT DETAIL (Transakce / Info)          -->
-    <!-- =================================================================== -->
-    <div id="accountDetailModal" class="hidden absolute inset-0 bg-[#F4F6F9] z-40 flex-col">
-      <header class="gb-header text-white px-4 pt-4 pb-4 shrink-0">
-        <div class="flex items-center justify-between">
-          <button type="button" onclick="closeAccountDetail()" class="p-1.5 -ml-1 rounded-full hover:bg-white/15 transition">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-          </button>
-          <span class="text-[15px] font-semibold">Detail účtu</span>
-          <button type="button" onclick="editAccountFromModal()" class="text-[12px] font-semibold bg-white/15 hover:bg-white/25 px-3 py-1 rounded-full">
-            Upravit
-          </button>
-        </div>
-
-        <div class="mt-3 px-1">
-          <div id="detailAccTitle" class="text-[17px] font-bold">Podnikatelský účet Standard</div>
-          <div id="detailAccSub" class="text-[12px] text-white/75 mt-0.5">2948102349 / 0800 • CZK</div>
-          <div id="detailAccBalance" class="text-[26px] font-bold mt-2 tracking-[-0.02em]">
-            0,<span class="czk-sup">00</span><span class="czk-unit">Kč</span>
+        <div class="card-scroller" style="margin-top:8px;">
+          <div class="bank-card style-graphite">
+            <div class="bc-top"><span>Debetní · fyzická</span><div class="chip-ico"></div></div>
+            <div class="bc-num">4273 •••• •••• 1899</div>
+            <div class="bc-bottom"><span class="bc-holder">Jan Novák</span><span class="bc-logo">KB Pay</span></div>
           </div>
-        </div>
-
-        <!-- Official George Business Account Detail Tabs: Transakce | Info -->
-        <div class="mt-4 bg-[#002963]/70 p-1 rounded-xl grid grid-cols-2 gap-1">
-          <button type="button" id="detailTabTransakce" onclick="switchAccountDetailTab('transakce')"
-            class="py-1.5 rounded-lg text-[12.5px] font-semibold bg-white text-[#003781] transition">
-            Transakce
-          </button>
-          <button type="button" id="detailTabInfo" onclick="switchAccountDetailTab('info')"
-            class="py-1.5 rounded-lg text-[12.5px] font-medium text-white/85 transition">
-            Info
-          </button>
-        </div>
-      </header>
-
-      <div class="flex-1 overflow-y-auto no-scrollbar p-4 pb-24">
-        <!-- Tab Content: Transakce -->
-        <div id="detailBodyTransakce" class="space-y-2.5">
-          <div class="gb-card p-6 text-center">
-            <div class="w-11 h-11 rounded-full bg-[#EEF3FA] text-[#0049A8] flex items-center justify-center mx-auto mb-2.5">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <polyline points="19 12 12 19 5 12"></polyline>
-              </svg>
-            </div>
-            <div class="text-[14px] font-semibold text-[#122236]">Zatím žádné transakce</div>
-            <p class="text-[12px] text-[#5A6B82] mt-1">Na tomto účtu nebyly za zvolené období zaúčtovány žádné pohyby.</p>
-          </div>
-        </div>
-
-        <!-- Tab Content: Info (Typ účtu, Majitel účtu, Číslo účtu, IBAN, BIC/SWIFT) -->
-        <div id="detailBodyInfo" class="hidden gb-card divide-y divide-[#EDF1F7]">
-          <div class="p-3.5 flex justify-between items-center">
-            <span class="text-[12.5px] text-[#5A6B82]">Typ a název účtu</span>
-            <span id="infoTyp" class="text-[13px] font-semibold text-[#122236] text-right">Podnikatelský účet Standard</span>
-          </div>
-          <div class="p-3.5 flex justify-between items-center">
-            <span class="text-[12.5px] text-[#5A6B82]">Majitel účtu</span>
-            <span id="infoMajitel" class="text-[13px] font-semibold text-[#122236] text-right">TARANT s.r.o.</span>
-          </div>
-          <div class="p-3.5 flex justify-between items-center">
-            <span class="text-[12.5px] text-[#5A6B82]">Číslo účtu</span>
-            <span id="infoCislo" class="text-[13px] font-semibold text-[#122236] text-right">2948102349 / 0800</span>
-          </div>
-          <div class="p-3.5 flex justify-between items-center">
-            <span class="text-[12.5px] text-[#5A6B82]">IBAN</span>
-            <span id="infoIban" class="text-[12.5px] font-semibold text-[#122236] text-right">CZ65 0800 0000 0029 4810 2349</span>
-          </div>
-          <div class="p-3.5 flex justify-between items-center">
-            <span class="text-[12.5px] text-[#5A6B82]">BIC / SWIFT</span>
-            <span class="text-[13px] font-semibold text-[#122236] text-right">GIBACZPX</span>
+          <div class="bank-card style-glass">
+            <div class="bc-top"><span>Virtuální · online</span><div class="chip-ico"></div></div>
+            <div class="bc-num">5511 •••• •••• 0427</div>
+            <div class="bc-bottom"><span class="bc-holder">Jan Novák</span><span class="bc-logo">KB Pay</span></div>
           </div>
         </div>
       </div>
 
-      <!-- Floating "+ Nová platba" button bottom-right matching official George Business docs -->
-      <button type="button" onclick="createPaymentFromDetail()"
-        class="absolute right-4 bottom-5 bg-[#0049A8] hover:bg-[#003781] active:scale-95 text-white text-[13.5px] font-semibold px-4 py-3 rounded-full shadow-lg flex items-center space-x-1.5 transition">
-        <span>+ Nová platba</span>
-      </button>
-    </div>
-
-
-    <!-- =================================================================== -->
-    <!-- MODAL 2: GEORGE BUSINESS AUTHORIZATION ("Potvrdit pokyn")           -->
-    <!-- =================================================================== -->
-    <div id="authModal" class="hidden absolute inset-0 bg-[#122236]/55 backdrop-blur-[2px] z-50 items-end justify-center">
-      <div class="bg-white w-full rounded-t-[24px] p-5 pb-7 space-y-4 shadow-2xl">
-        <div class="w-10 h-1 bg-[#D5DCE6] rounded-full mx-auto"></div>
-        <div class="flex items-start justify-between">
-          <div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[#0049A8]">Autorizace George Business</span>
-            <h3 id="authTitle" class="text-[17px] font-bold text-[#122236] mt-0.5">Potvrzení platebního příkazu</h3>
-          </div>
-          <button type="button" onclick="closeAuthModal()" class="p-1 text-[#5A6B82] rounded-full hover:bg-gray-100">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
+      <div>
+        <div class="section-title">
+          <h2>Poslední pohyby</h2>
+          <button class="linklike" data-nav="history">Vše →</button>
         </div>
-
-        <div class="bg-[#F4F6F9] rounded-xl p-3.5 space-y-2 border border-[#E2E7EE]">
-          <div class="flex justify-between text-[12.5px]">
-            <span class="text-[#5A6B82]">Příjemce</span>
-            <span id="authRecipient" class="font-semibold text-[#122236]">—</span>
-          </div>
-          <div class="flex justify-between text-[12.5px]">
-            <span class="text-[#5A6B82]">Protiúčet</span>
-            <span id="authCounterAccount" class="font-semibold text-[#122236]">—</span>
-          </div>
-          <div class="flex justify-between text-[13px] pt-1.5 border-t border-[#E2E7EE]">
-            <span class="text-[#5A6B82]">Částka</span>
-            <span id="authAmount" class="font-bold text-[#003781]">0,00 Kč</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5 pt-1">
-          <button type="button" onclick="closeAuthModal()"
-            class="py-3 rounded-xl bg-[#EEF3FA] hover:bg-[#E1EAF7] text-[#122236] font-semibold text-[13.5px] transition">
-            Odmítnout
-          </button>
-          <button type="button" onclick="confirmInstructionAction()"
-            class="py-3 rounded-xl bg-[#0049A8] hover:bg-[#003781] text-white font-semibold text-[13.5px] shadow-md flex items-center justify-center space-x-1.5 transition">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              <polyline points="9 12 11 14 15 10"></polyline>
-            </svg>
-            <span>Potvrdit a podepsat</span>
-          </button>
+        <div class="card" style="padding-block: 4px; margin-top: 10px;">
+          <div class="tx"><div class="dot">🛒</div><div class="meta"><div class="who">Albert, supermarket</div><div class="when">Dnes · 09:14</div></div><div class="amt neg">−612,00 Kč</div></div>
+          <div class="tx"><div class="dot">💶</div><div class="meta"><div class="who">Mzda, Technika s.r.o.</div><div class="when">Včera · 11:02</div></div><div class="amt pos">+42 000,00 Kč</div></div>
+          <div class="tx"><div class="dot">📶</div><div class="meta"><div class="who">T-Mobile, tarif</div><div class="when">17. 11. · 08:30</div></div><div class="amt neg">−399,00 Kč</div></div>
         </div>
       </div>
     </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
 
-
-    <!-- Toast Notification -->
-    <div id="toastBanner" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 bg-[#122236]/95 text-white text-[12.5px] font-medium px-4 py-2 rounded-full shadow-lg z-50 whitespace-nowrap toast-anim">
-      Uloženo
+  <!-- CARDS LIST -->
+  <section id="screen-cards" class="app-screen" hidden>
+    <div class="topbar">
+      <button class="icon-btn" data-nav="home" aria-label="Zpět"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">Moje karty</div>
+      <div style="width:36px"></div>
     </div>
+    <div class="screen">
+      <div class="card-scroller">
+        <div class="bank-card style-graphite" data-card="debit">
+          <span class="frozen-flag" hidden>Zmrazeno</span>
+          <div class="bc-top"><span>Debetní · fyzická</span><div class="chip-ico"></div></div>
+          <div class="bc-num">4273 •••• •••• 1899</div>
+          <div class="bc-bottom"><span class="bc-holder">Jan Novák</span><span class="bc-logo">KB Pay</span></div>
+        </div>
+        <div class="bank-card style-glass" data-card="virtual">
+          <span class="frozen-flag" hidden>Zmrazeno</span>
+          <div class="bc-top"><span>Virtuální · online</span><div class="chip-ico"></div></div>
+          <div class="bc-num">5511 •••• •••• 0427</div>
+          <div class="bc-bottom"><span class="bc-holder">Jan Novák</span><span class="bc-logo">KB Pay</span></div>
+        </div>
+        <div class="bank-card style-gold" data-card="credit">
+          <span class="frozen-flag" hidden>Zmrazeno</span>
+          <div class="bc-top"><span>Kreditní · fyzická</span><div class="chip-ico"></div></div>
+          <div class="bc-num">4916 •••• •••• 7730</div>
+          <div class="bc-bottom"><span class="bc-holder">Jan Novák</span><span class="bc-logo">KB Pay Gold</span></div>
+        </div>
+        <button class="bank-card add-card" id="btn-add-card" type="button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Objednat novou kartu
+        </button>
+      </div>
 
+      <div id="card-detail-debit" class="card-detail" data-for="debit">
+        <div class="section-title"><h2>Debetní karta</h2><span class="badge on" data-status-badge>Aktivní</span></div>
+        <div class="card" style="display:flex; flex-direction:column; gap:4px; margin-top:8px; padding-block:4px;">
+          <div class="profile-row"><span class="k">Zmrazit kartu</span><label class="switch"><input type="checkbox" data-toggle="freeze"><span class="track"></span><span class="knob"></span></label></div>
+          <div class="profile-row"><span class="k">Bezkontaktní platby</span><label class="switch"><input type="checkbox" data-toggle="contactless" checked><span class="track"></span><span class="knob"></span></label></div>
+          <div class="profile-row"><span class="k">Platby na internetu</span><label class="switch"><input type="checkbox" data-toggle="online" checked><span class="track"></span><span class="knob"></span></label></div>
+          <div class="profile-row"><span class="k">Platby v zahraničí</span><label class="switch"><input type="checkbox" data-toggle="abroad"><span class="track"></span><span class="knob"></span></label></div>
+        </div>
+        <div class="card" style="margin-top:12px;">
+          <div class="section-title"><h2 style="font-size:0.9rem;">Denní limit pro platby</h2></div>
+          <div class="limit-row" style="margin-top:10px;">
+            <button type="button" data-limit="-">−</button>
+            <span class="limit-val" data-limit-value>20 000 Kč</span>
+            <button type="button" data-limit="+">+</button>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:12px;">
+          <button class="btn btn-ghost" type="button" data-reveal>Zobrazit údaje karty</button>
+          <button class="btn btn-danger" type="button" data-block>Zablokovat kartu</button>
+        </div>
+        <div class="card" data-reveal-panel hidden style="margin-top:12px; text-align:center;">
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; letter-spacing:0.08em;">4273 9910 5582 1899</div>
+          <div style="display:flex; justify-content:center; gap:24px; margin-top:8px; font-size:0.85rem; color:var(--ink-dim);"><span>Platnost 09/29</span><span>CVV 482</span></div>
+        </div>
+      </div>
+    </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
+
+  <!-- HISTORY -->
+  <section id="screen-history" class="app-screen" hidden>
+    <div class="topbar">
+      <button class="icon-btn" data-nav="home" aria-label="Zpět"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">Historie pohybů</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="screen">
+      <div class="card" style="display:flex; gap:8px; overflow-x:auto;">
+        <button class="badge" data-filter="all" aria-pressed="true">Vše</button>
+        <button class="badge muted" data-filter="purchase">Nákupy</button>
+        <button class="badge muted" data-filter="transfer">Platby</button>
+        <button class="badge muted" data-filter="income">Příjmy</button>
+      </div>
+
+      <div>
+        <div class="section-title"><h2>Listopad 2026</h2></div>
+        <div class="card" id="history-list" style="padding-block:4px; margin-top:8px;">
+          <div class="tx" data-cat="purchase"><div class="dot">🛒</div><div class="meta"><div class="who">Albert, supermarket</div><div class="when">19. 11. · 09:14</div></div><div class="amt neg">−612,00 Kč</div></div>
+          <div class="tx" data-cat="income"><div class="dot">💶</div><div class="meta"><div class="who">Mzda, Technika s.r.o.</div><div class="when">18. 11. · 11:02</div></div><div class="amt pos">+42 000,00 Kč</div></div>
+          <div class="tx" data-cat="purchase"><div class="dot">📶</div><div class="meta"><div class="who">T-Mobile, tarif</div><div class="when">17. 11. · 08:30</div></div><div class="amt neg">−399,00 Kč</div></div>
+          <div class="tx" data-cat="purchase"><div class="dot">☕</div><div class="meta"><div class="who">Kavárna Mlsná Kočka</div><div class="when">16. 11. · 17:40</div></div><div class="amt neg">−95,00 Kč</div></div>
+          <div class="tx" data-cat="purchase"><div class="dot">🚈</div><div class="meta"><div class="who">DPP, jízdenka</div><div class="when">15. 11. · 07:55</div></div><div class="amt neg">−550,00 Kč</div></div>
+          <div class="tx" data-cat="transfer"><div class="dot">🔁</div><div class="meta"><div class="who">Platba — Marek Novák</div><div class="when">14. 11. · 20:11</div></div><div class="amt neg">−1 200,00 Kč</div></div>
+        </div>
+      </div>
+    </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
+
+  <!-- TRANSFER -->
+  <section id="screen-transfer" class="app-screen" hidden>
+    <div class="topbar">
+      <button class="icon-btn" data-nav="home" aria-label="Zpět"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">Nová platba</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="screen">
+      <div class="chip-row">
+        <button class="chip" data-quick-recipient="Marek Novák|2300000000257741018"><span class="avatar">MN</span><span>Marek</span></button>
+        <button class="chip" data-quick-recipient="Eva Krátká|0100000000004477732"><span class="avatar">EK</span><span>Eva</span></button>
+        <button class="chip" data-quick-recipient="Pavel Horák|0600000000001234410"><span class="avatar">PH</span><span>Pavel</span></button>
+      </div>
+      <form id="transfer-form" style="display:flex; flex-direction:column; gap:14px;">
+        <label class="field">Příjemce
+          <input id="tr-name" type="text" placeholder="Jméno nebo číslo účtu" value="Marek Novák" required>
+        </label>
+        <label class="field">Číslo účtu / IBAN
+          <input id="tr-iban" type="text" placeholder="123456789/9999" value="257741018/9999" required>
+        </label>
+        <label class="field">Částka
+          <input type="number" inputmode="decimal" placeholder="0" value="1500" required>
+        </label>
+        <label class="field">Zpráva pro příjemce
+          <input type="text" placeholder="Za nájem, dárek…">
+        </label>
+        <div class="card" style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--ink-dim);">
+          <span>Poplatek</span><span>0,00 Kč</span>
+        </div>
+        <button class="btn btn-primary" type="submit">Odeslat platbu</button>
+      </form>
+      <div id="transfer-ok" class="card" hidden style="text-align:center; gap:10px; display:flex; flex-direction:column; align-items:center;">
+        <div style="width:56px; height:56px; border-radius:999px; background:color-mix(in srgb, var(--good) 18%, transparent); color:var(--good); display:grid; place-items:center;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <h3>Platba byla odeslána</h3>
+        <p style="color:var(--ink-dim); font-size:0.85rem;">Demo operace, peníze nikam neodešly.</p>
+        <button class="btn btn-ghost" type="button" data-nav="home">Na hlavní stránku</button>
+      </div>
+    </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
+
+  <!-- QR -->
+  <section id="screen-qr" class="app-screen" hidden>
+    <div class="topbar">
+      <button class="icon-btn" data-nav="home" aria-label="Zpět"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">QR platba</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="screen">
+      <div class="seg-row">
+        <button class="seg" aria-pressed="true" data-qr-tab="receive">Přijmout platbu</button>
+        <button class="seg" aria-pressed="false" data-qr-tab="scan">Naskenovat</button>
+      </div>
+
+      <div id="qr-receive" class="card" style="text-align:center; display:flex; flex-direction:column; gap:14px;">
+        <p style="color:var(--ink-dim); font-size:0.85rem;">Tento QR kód zobrazuje náhled platebních údajů přímo v aplikaci. Nejde o funkční platební odkaz pro externí čtečky.</p>
+        <div class="qr-box">
+          <svg viewBox="0 0 100 100" width="150" height="150">
+            <rect width="100" height="100" fill="none"/>
+            <g fill="var(--ink)">
+              <rect x="6" y="6" width="22" height="22"/><rect x="72" y="6" width="22" height="22"/><rect x="6" y="72" width="22" height="22"/>
+              <rect x="12" y="12" width="10" height="10" fill="var(--surface)"/><rect x="78" y="12" width="10" height="10" fill="var(--surface)"/><rect x="12" y="78" width="10" height="10" fill="var(--surface)"/>
+              <rect x="36" y="6" width="6" height="6"/><rect x="48" y="6" width="6" height="6"/><rect x="60" y="6" width="6" height="6"/>
+              <rect x="36" y="88" width="6" height="6"/><rect x="48" y="36" width="6" height="6"/><rect x="60" y="48" width="6" height="6"/>
+              <rect x="36" y="48" width="6" height="6"/><rect x="36" y="60" width="6" height="6"/><rect x="48" y="60" width="6" height="6"/>
+              <rect x="60" y="72" width="6" height="6"/><rect x="72" y="60" width="6" height="6"/><rect x="84" y="48" width="6" height="6"/>
+              <rect x="84" y="36" width="6" height="6"/><rect x="72" y="84" width="6" height="6"/><rect x="60" y="36" width="6" height="6"/>
+            </g>
+          </svg>
+        </div>
+        <div><strong id="qr-amount">1 500,00 Kč</strong><div style="font-size:0.78rem; color:var(--ink-dim);">2165899412/9999 · Jan Novák</div></div>
+        <span class="badge" style="align-self:center;">Kód je platný 5 minut</span>
+      </div>
+
+      <div id="qr-scan" class="card" hidden style="text-align:center; display:flex; flex-direction:column; gap:12px;">
+        <div class="qr-box" style="background:var(--surface-2); color:var(--ink-dim); font-size:0.8rem; padding:16px;">Náhled kamery (demo) — skenování je simulováno tlačítkem níže</div>
+        <button class="btn btn-primary" type="button" id="qr-scan-btn">Naskenovat ukázkový kód</button>
+        <p id="qr-scan-result" style="font-size:0.85rem; color:var(--ink-dim);" hidden></p>
+      </div>
+    </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
+
+  <!-- NOTIFICATIONS -->
+  <section id="screen-notifications" class="app-screen" hidden>
+    <div class="topbar">
+      <button class="icon-btn" data-nav="home" aria-label="Zpět"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">Oznámení</div>
+      <button class="icon-btn" id="notif-clear" aria-label="Označit vše jako přečtené"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></button>
+    </div>
+    <div class="screen">
+      <div class="card" id="notif-list" style="padding-block:4px;">
+        <div class="notif-row unread"><div class="dot">💶</div><div><div style="font-weight:600; font-size:0.9rem;">Přišla platba 42 000,00 Kč</div><div style="font-size:0.78rem; color:var(--ink-dim);">Mzda, Technika s.r.o. · dnes 11:02</div></div></div>
+        <div class="notif-row unread"><div class="dot">🔒</div><div><div style="font-weight:600; font-size:0.9rem;">Nové přihlášení k účtu</div><div style="font-size:0.78rem; color:var(--ink-dim);">Praha, Česko · dnes 08:51</div></div></div>
+        <div class="notif-row"><div class="dot">🛒</div><div><div style="font-weight:600; font-size:0.9rem;">Platba kartou 612,00 Kč</div><div style="font-size:0.78rem; color:var(--ink-dim);">Albert, supermarket · včera</div></div></div>
+      </div>
+    </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
+
+  <!-- CONTACTS / SUPPORT -->
+  <section id="screen-contacts" class="app-screen" hidden>
+    <div class="topbar">
+      <button class="icon-btn" data-nav="home" aria-label="Zpět"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">Podpora</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="screen">
+      <div>
+        <div class="section-title"><h2>Časté dotazy</h2></div>
+        <div class="card" style="padding-block:4px; margin-top:8px;">
+          <button class="profile-row" data-faq><span>Jak zablokuji ztracenou kartu?</span><span>→</span></button>
+          <button class="profile-row" data-faq><span>Jak změním denní limit?</span><span>→</span></button>
+          <button class="profile-row" data-faq><span>Jak funguje QR platba?</span><span>→</span></button>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><h2>Kontaktujte nás</h2></div>
+        <div class="card" style="margin-top:8px; display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div><div style="font-size:0.75rem; color:var(--ink-dim);">Telefon</div><div style="font-weight:600;">800 123 456</div></div>
+            <span class="badge">Nonstop</span>
+          </div>
+          <div><div style="font-size:0.75rem; color:var(--ink-dim);">E-mail</div><div style="font-weight:600;">podpora@kurvabank.demo</div></div>
+          <p style="font-size:0.75rem; color:var(--ink-dim); margin:0;">Jde o maketu pro školní projekt — kontaktní údaje jsou fiktivní.</p>
+        </div>
+      </div>
+    </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="screen-profile" class="app-screen" hidden>
+    <div class="topbar">
+      <button class="icon-btn" data-nav="home" aria-label="Zpět"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="wordmark">Profil</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="screen">
+      <div class="card" style="display:flex; align-items:center; gap:14px;">
+        <div class="avatar" style="width:56px; height:56px; font-size:1.1rem;">JN</div>
+        <div>
+          <div style="font-weight:700;">Jan Novák</div>
+          <div style="font-size:0.8rem; color:var(--ink-dim);">Klient od roku 2022</div>
+        </div>
+      </div>
+      <div class="card" style="padding-block:4px;">
+        <div class="profile-row" style="cursor:default;"><span class="k">Klientské číslo</span><span>4821 1193</span></div>
+        <div class="profile-row" style="cursor:default;"><span class="k">Telefon</span><span>+420 601 234 567</span></div>
+        <div class="profile-row" style="cursor:default;"><span class="k">E-mail</span><span>jan.novak@demo.cz</span></div>
+        <div class="profile-row" style="cursor:default;"><span class="k">Tarif</span><span>KurvaBank Smart</span></div>
+      </div>
+      <div class="card" style="display:flex; flex-direction:column; gap:2px; padding-block:4px;">
+        <button class="profile-row" id="open-security"><span>Zabezpečení a PIN</span><span class="right">→</span></button>
+        <button class="profile-row" data-nav="notifications"><span>Oznámení</span><span class="right">→</span></button>
+        <button class="profile-row" data-nav="cards"><span>Karty</span><span class="right">→</span></button>
+      </div>
+      <div class="card" style="padding-block:4px;">
+        <div class="profile-row"><span>Tmavý režim podle systému</span><span class="right" style="color:var(--ink-dim); font-size:0.78rem;">Automaticky</span></div>
+        <div class="profile-row"><span>Biometrické přihlášení</span><label class="switch"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
+        <div class="profile-row"><span>Push oznámení</span><label class="switch"><input type="checkbox" checked><span class="track"></span><span class="knob"></span></label></div>
+      </div>
+      <button class="btn btn-ghost" id="logout-btn">Odhlásit se</button>
+      <p style="font-size:0.72rem; color:var(--ink-dim); text-align:center;">KurvaBank — školní projekt, nejde o skutečnou finanční službu.</p>
+    </div>
+    <nav class="tabs" data-tabs></nav>
+  </section>
+
+</div>
+
+<!-- SECURITY SHEET -->
+<div class="sheet-wrap" id="security-sheet" hidden>
+  <div class="sheet-backdrop" data-close-sheet></div>
+  <div class="sheet">
+    <div class="handle"></div>
+    <h3>Zabezpečení a PIN</h3>
+    <form id="pin-form" style="display:flex; flex-direction:column; gap:12px;">
+      <label class="field">Současný PIN
+        <input type="password" inputmode="numeric" maxlength="4" placeholder="••••" required>
+      </label>
+      <label class="field">Nový PIN
+        <input type="password" inputmode="numeric" maxlength="4" placeholder="••••" required>
+      </label>
+      <button class="btn btn-primary" type="submit">Uložit nový PIN</button>
+    </form>
+    <button class="btn btn-ghost" type="button" data-close-sheet>Zavřít</button>
   </div>
+</div>
 
-  <script>
-    /**
-     * George Business Česko — State & Configuration
-     * Strictly 0,00 Kč on initial load, NO session ID login,
-     * 3 bottom tabs ("Přehled", "Pokyny k potvrzení", "Menu"),
-     * and full JSON/TXT file + manual balance editing.
-     */
-    const STORAGE_KEY = 'george_business_cz_state_v2';
+<!-- FAQ SHEET -->
+<div class="sheet-wrap" id="faq-sheet" hidden>
+  <div class="sheet-backdrop" data-close-sheet></div>
+  <div class="sheet">
+    <div class="handle"></div>
+    <h3 id="faq-title">Nápověda</h3>
+    <p id="faq-body" style="color:var(--ink-dim); font-size:0.9rem; line-height:1.5;"></p>
+    <button class="btn btn-ghost" type="button" data-close-sheet>Zavřít</button>
+  </div>
+</div>
 
-    const DEFAULT_STATE = {
-      companyName: 'TARANT s.r.o.',
-      accounts: [
-        {
-          id: 'acc1',
-          title: 'Podnikatelský účet Standard',
-          owner: 'TARANT s.r.o.',
-          accountNumber: '2948102349 / 0800',
-          iban: 'CZ65 0800 0000 0029 4810 2349',
-          currency: 'CZK',
-          balance: 0
-        },
-        {
-          id: 'acc2',
-          title: 'Běžný účet Standard',
-          owner: 'Václav Tarant',
-          accountNumber: '1849201123 / 0800',
-          iban: 'CZ42 0800 0000 0018 4920 1123',
-          currency: 'CZK',
-          balance: 0
-        },
-        {
-          id: 'acc3',
-          title: 'Plus účet Business',
-          owner: 'Marcela Tarantová, st.',
-          accountNumber: '3091827451 / 0800',
-          iban: 'CZ88 0800 0000 0030 9182 7451',
-          currency: 'CZK',
-          balance: 0
-        }
-      ],
-      pokyny: []
-    };
+<div class="toast-wrap" id="toast-wrap"></div>
 
-    let appState = loadState();
-    let currentTab = 'prehled';
-    let pokynyFilter = 'pending';
-    let editorMode = 'add'; // 'add' | 'set'
-    let activeDetailAccountId = null;
-    let activeAuthPokynId = null;
-    let toastTimer = null;
+<script>
+(function () {
+  var screens = ["home", "cards", "history", "transfer", "qr", "notifications", "contacts", "profile"];
+  var onboardScreens = ["login", "register-1", "register-2", "register-3", "register-4"];
+  var tabsDef = [
+    { id: "home", label: "Domů", icon: '<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>' },
+    { id: "cards", label: "Karty", icon: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>' },
+    { id: "transfer", label: "Platby", icon: '<path d="M7 7h10M7 7l3-3M7 7l3 3M17 17H7M17 17l-3 3M17 17l-3-3"/>' },
+    { id: "history", label: "Historie", icon: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l4 2"/>' },
+    { id: "profile", label: "Profil", icon: '<circle cx="12" cy="8" r="4"/><path d="M4 20c1.8-4 4.8-6 8-6s6.2 2 8 6"/>' }
+  ];
 
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
-        const parsed = JSON.parse(raw);
-        if (!parsed || !Array.isArray(parsed.accounts)) {
-          return JSON.parse(JSON.stringify(DEFAULT_STATE));
-        }
-        return {
-          companyName: parsed.companyName || DEFAULT_STATE.companyName,
-          accounts: parsed.accounts.map((acc, idx) => ({
-            id: acc.id || `acc${idx + 1}`,
-            title: acc.title || DEFAULT_STATE.accounts[idx]?.title || 'Firemní účet',
-            owner: acc.owner || DEFAULT_STATE.accounts[idx]?.owner || 'TARANT s.r.o.',
-            accountNumber: acc.accountNumber || DEFAULT_STATE.accounts[idx]?.accountNumber || '2948102349 / 0800',
-            iban: acc.iban || DEFAULT_STATE.accounts[idx]?.iban || 'CZ65 0800 0000 0029 4810 2349',
-            currency: acc.currency || 'CZK',
-            balance: Math.max(0, Number(acc.balance) || 0)
-          })),
-          pokyny: Array.isArray(parsed.pokyny) ? parsed.pokyny : []
-        };
-      } catch (err) {
-        return JSON.parse(JSON.stringify(DEFAULT_STATE));
-      }
+  function tabsHtml(current) {
+    return tabsDef.map(function (t) {
+      return '<button class="tab" data-nav="' + t.id + '" aria-current="' + (t.id === current ? "true" : "false") + '">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + t.icon + '</svg>' +
+        '<span>' + t.label + '</span></button>';
+    }).join("");
+  }
+
+  function renderTabs() {
+    var current = location.hash.replace("#", "") || "home";
+    document.querySelectorAll('[data-tabs]').forEach(function (nav) { nav.innerHTML = tabsHtml(current); });
+  }
+
+  function showScreen(name) {
+    var isApp = screens.indexOf(name) !== -1;
+    var isOnboard = onboardScreens.indexOf(name) !== -1;
+    screens.forEach(function (s) { document.getElementById("screen-" + s).hidden = !(isApp && s === name); });
+    onboardScreens.forEach(function (s) { document.getElementById("screen-" + s).hidden = !(isOnboard && s === name); });
+    if (!isApp && !isOnboard) { document.getElementById("screen-login").hidden = false; }
+    renderTabs();
+    window.scrollTo(0, 0);
+  }
+
+  function go(name) { location.hash = name === "login" ? "" : name; showScreen(name); }
+
+  function toast(msg) {
+    var wrap = document.getElementById("toast-wrap");
+    var el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(function () { el.remove(); }, 2600);
+  }
+
+  document.addEventListener("click", function (e) {
+    var nav = e.target.closest("[data-nav]");
+    if (nav) { e.preventDefault(); go(nav.getAttribute("data-nav")); return; }
+
+    var closeSheet = e.target.closest("[data-close-sheet]");
+    if (closeSheet) { closeSheet.closest(".sheet-wrap").hidden = true; return; }
+
+    var seg = e.target.closest("[data-qr-tab]");
+    if (seg) {
+      document.querySelectorAll("[data-qr-tab]").forEach(function (b) { b.setAttribute("aria-pressed", "false"); });
+      seg.setAttribute("aria-pressed", "true");
+      var isReceive = seg.getAttribute("data-qr-tab") === "receive";
+      document.getElementById("qr-receive").hidden = !isReceive;
+      document.getElementById("qr-scan").hidden = isReceive;
+      return;
     }
 
-    function saveState() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-      } catch (err) {
-        console.warn('Storage unavailable', err);
-      }
-    }
-
-    /**
-     * Format Czech currency with non-breaking space thousands & superscript haléře
-     */
-    function formatCZK(amount) {
-      const safe = Math.max(0, Number(amount) || 0);
-      const [intPart, decPart] = safe.toFixed(2).split('.');
-      const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-      return `${formattedInt},<span class="czk-sup">${decPart}</span><span class="czk-unit">Kč</span>`;
-    }
-
-    /**
-     * Render all UI sections consistently
-     */
-    function renderAll() {
-      renderPrehled();
-      renderPokyny();
-      renderMenuEditors();
-      updateBadges();
-    }
-
-    /**
-     * Render View 1: Přehled
-     */
-    function renderPrehled() {
-      document.getElementById('headerCompanyName').textContent = appState.companyName;
-      document.getElementById('pokynyCompanyLabel').textContent = appState.companyName;
-      document.getElementById('menuCompanyName').textContent = appState.companyName;
-
-      // Total corporate sum
-      const total = appState.accounts.reduce((sum, a) => sum + (Number(a.balance) || 0), 0);
-      document.getElementById('totalCorporateBalance').innerHTML = formatCZK(total);
-
-      const container = document.getElementById('overviewAccountsContainer');
-      container.innerHTML = '';
-
-      appState.accounts.forEach(acc => {
-        const isPositive = acc.balance > 0;
-        const balanceColor = isPositive ? 'text-[#137333]' : 'text-[#122236]';
-        const subtitleText = acc.owner && acc.owner !== appState.companyName
-          ? `${acc.owner} • ${acc.accountNumber}`
-          : `${acc.accountNumber} • ${acc.currency}`;
-
-        const card = document.createElement('div');
-        card.className = 'gb-card p-3.5 cursor-pointer active:bg-[#F9FBFD] transition';
-        card.onclick = () => openAccountDetail(acc.id);
-
-        card.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div class="pr-2">
-              <div class="text-[14.5px] font-semibold text-[#122236] leading-snug">${acc.title}</div>
-              <div class="text-[12px] text-[#5A6B82] mt-0.5">${subtitleText}</div>
-            </div>
-
-            <!-- Official George Business 3-dot account actions button -->
-            <button type="button" onclick="event.stopPropagation(); openQuickEditFromOverview('${acc.id}')"
-              aria-label="Akce účtu" title="Upravit zůstatek účtu"
-              class="p-1.5 -mr-1.5 -mt-1 text-[#5A6B82] hover:text-[#0049A8] hover:bg-[#EEF3FA] rounded-full transition shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="5" r="1.75"></circle>
-                <circle cx="12" cy="12" r="1.75"></circle>
-                <circle cx="12" cy="19" r="1.75"></circle>
-              </svg>
-            </button>
-          </div>
-
-          <div class="mt-3 flex items-baseline justify-between">
-            <div class="text-[22px] font-bold ${balanceColor} tracking-[-0.02em] leading-none">
-              ${formatCZK(acc.balance)}
-            </div>
-            <span class="text-[11px] font-medium text-[#5A6B82]">Disponibilní</span>
-          </div>
-        `;
-
-        container.appendChild(card);
+    var filter = e.target.closest("[data-filter]");
+    if (filter) {
+      document.querySelectorAll("[data-filter]").forEach(function (b) { b.classList.remove("badge"); b.classList.add("badge", "muted"); b.setAttribute("aria-pressed", "false"); });
+      filter.classList.remove("muted");
+      filter.setAttribute("aria-pressed", "true");
+      var cat = filter.getAttribute("data-filter");
+      document.querySelectorAll("#history-list .tx").forEach(function (row) {
+        row.hidden = cat !== "all" && row.getAttribute("data-cat") !== cat;
       });
+      return;
     }
 
-    /**
-     * Render View 2: Pokyny k potvrzení
-     */
-    function renderPokyny() {
-      const pendingItems = appState.pokyny.filter(p => p.status === 'pending');
-      const doneItems = appState.pokyny.filter(p => p.status === 'done');
-
-      document.getElementById('count-pending').textContent = pendingItems.length;
-      document.getElementById('count-done').textContent = doneItems.length;
-
-      const listContainer = document.getElementById('pokynyListContainer');
-      let itemsToShow = [];
-      if (pokynyFilter === 'pending') itemsToShow = pendingItems;
-      else if (pokynyFilter === 'done') itemsToShow = doneItems;
-      else itemsToShow = [];
-
-      if (itemsToShow.length === 0) {
-        const emptyTitle = pokynyFilter === 'pending'
-          ? 'Žádné pokyny k potvrzení'
-          : pokynyFilter === 'waiting'
-            ? 'Žádné čekající příkazy'
-            : 'Žádné provedené pokyny';
-        const emptyDesc = pokynyFilter === 'pending'
-          ? 'Všechny firemní příkazy a autorizace jsou aktuálně vyřízené.'
-          : 'V této záložce se zatím nenacházejí žádné záznamy.';
-
-        listContainer.innerHTML = `
-          <div class="gb-card p-7 text-center mt-2">
-            <div class="w-12 h-12 rounded-full bg-[#EEF3FA] text-[#0049A8] flex items-center justify-center mx-auto mb-3">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <polyline points="9 12 11 14 15 10"></polyline>
-              </svg>
-            </div>
-            <div class="text-[15px] font-bold text-[#122236]">${emptyTitle}</div>
-            <p class="text-[12.5px] text-[#5A6B82] mt-1 leading-relaxed">${emptyDesc}</p>
-          </div>
-        `;
-        return;
-      }
-
-      listContainer.innerHTML = `<div class="space-y-2.5">` + itemsToShow.map(item => `
-        <div class="gb-card p-4">
-          <div class="flex items-start justify-between">
-            <div>
-              <span class="text-[11px] font-semibold ${item.status === 'pending' ? 'text-[#B06000] bg-[#FEF7E0]' : 'text-[#137333] bg-[#E6F4EA]'} px-2 py-0.5 rounded-full">
-                ${item.status === 'pending' ? 'Čeká na podpis' : 'Podepsáno a odesláno'}
-              </span>
-              <div class="text-[14.5px] font-bold text-[#122236] mt-2">${item.recipient}</div>
-              <div class="text-[12px] text-[#5A6B82] mt-0.5">${item.counterAccount} • VS: ${item.vs || '—'}</div>
-            </div>
-            <div class="text-right">
-              <div class="text-[17px] font-bold text-[#122236]">${formatCZK(item.amount)}</div>
-              <div class="text-[11px] text-[#5A6B82] mt-0.5">${item.date || 'Dnes'}</div>
-            </div>
-          </div>
-          ${item.status === 'pending' ? `
-            <div class="mt-3 pt-3 border-t border-[#EDF1F7] flex justify-end">
-              <button type="button" onclick="openAuthModal('${item.id}')"
-                class="bg-[#0049A8] hover:bg-[#003781] text-white text-[12.5px] font-semibold px-4 py-2 rounded-xl transition">
-                Potvrdit pokyn
-              </button>
-            </div>
-          ` : ''}
-        </div>
-      `).join('') + `</div>`;
+    var quick = e.target.closest("[data-quick-recipient]");
+    if (quick) {
+      var parts = quick.getAttribute("data-quick-recipient").split("|");
+      document.getElementById("tr-name").value = parts[0];
+      document.getElementById("tr-iban").value = parts[1].slice(-9) + "/9999";
+      return;
     }
 
-    /**
-     * Render View 3: Menu Account Balance Editors & Sync Inline JSON
-     */
-    function renderMenuEditors(focusAccountId = null) {
-      const container = document.getElementById('menuAccountEditors');
-      container.innerHTML = '';
-
-      appState.accounts.forEach(acc => {
-        const isPositive = acc.balance > 0;
-        const btnLabel = editorMode === 'add' ? 'Přidat' : 'Uložit';
-
-        const box = document.createElement('div');
-        box.id = `menu-editor-${acc.id}`;
-        box.className = 'bg-[#F8FAFC] border border-[#E2E7EE] rounded-xl p-3 space-y-2 transition-all';
-
-        box.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div>
-              <div class="text-[13.5px] font-bold text-[#122236]">${acc.title}</div>
-              <div class="text-[11.5px] text-[#5A6B82]">${acc.owner} • ${acc.accountNumber}</div>
-            </div>
-            <div class="text-right">
-              <div class="text-[10px] uppercase tracking-wider text-[#5A6B82] font-semibold">Aktuálně</div>
-              <div class="text-[15px] font-bold ${isPositive ? 'text-[#137333]' : 'text-[#122236]'}">
-                ${formatCZK(acc.balance)}
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-1.5">
-            <div class="relative flex-1">
-              <input type="number" inputmode="decimal" step="0.01" min="0"
-                id="input-acc-${acc.id}"
-                placeholder="${editorMode === 'add' ? 'Částka k přičtení...' : 'Nový zůstatek...'}"
-                onkeydown="if(event.key==='Enter') applyAccountAmount('${acc.id}')"
-                class="w-full bg-white border border-[#D5DCE6] focus:border-[#0049A8] rounded-lg pl-3 pr-8 py-2 text-[13.5px] font-medium text-[#122236] outline-none" />
-              <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#5A6B82]">Kč</span>
-            </div>
-            <button type="button" onclick="applyAccountAmount('${acc.id}')"
-              class="bg-[#0049A8] hover:bg-[#003781] text-white text-[12.5px] font-semibold px-3.5 py-2 rounded-lg shrink-0 transition">
-              ${btnLabel}
-            </button>
-            <button type="button" onclick="zeroSingleAccount('${acc.id}')" title="Vynulovat účet"
-              class="bg-[#E6ECF4] hover:bg-[#D8E1EE] text-[#122236] text-[12px] font-bold px-2.5 py-2 rounded-lg shrink-0 transition">
-              0
-            </button>
-          </div>
-
-          <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-            ${[500, 5000, 25000, 100000].map(val => `
-              <button type="button" onclick="quickAddPreset('${acc.id}', ${val})"
-                class="text-[11px] font-semibold bg-white border border-[#DCE3ED] hover:border-[#0049A8] text-[#0049A8] px-2.5 py-1 rounded-full shrink-0 transition">
-                +${val.toLocaleString('cs-CZ')} Kč
-              </button>
-            `).join('')}
-          </div>
-        `;
-
-        container.appendChild(box);
-      });
-
-      // Keep inline JSON textarea synchronized
-      const jsonTextarea = document.getElementById('inlineJsonTextarea');
-      if (jsonTextarea) {
-        jsonTextarea.value = JSON.stringify(appState, null, 2);
-      }
-
-      if (focusAccountId) {
-        setTimeout(() => {
-          const el = document.getElementById(`menu-editor-${focusAccountId}`);
-          const inp = document.getElementById(`input-acc-${focusAccountId}`);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            el.classList.add('ring-2', 'ring-[#0049A8]');
-            setTimeout(() => el.classList.remove('ring-2', 'ring-[#0049A8]'), 1400);
-          }
-          if (inp) inp.focus();
-        }, 90);
-      }
+    var reveal = e.target.closest("[data-reveal]");
+    if (reveal) {
+      var panel = reveal.closest(".card-detail").querySelector("[data-reveal-panel]");
+      panel.hidden = !panel.hidden;
+      reveal.textContent = panel.hidden ? "Zobrazit údaje karty" : "Skrýt údaje karty";
+      return;
     }
 
-    /**
-     * Update notification badges for pending instructions
-     */
-    function updateBadges() {
-      const pendingCount = appState.pokyny.filter(p => p.status === 'pending').length;
-      const navBadge = document.getElementById('navPendingBadge');
-      const bellDot = document.getElementById('bellDot');
+    var block = e.target.closest("[data-block]");
+    if (block) { toast("Karta byla zablokována. Kontaktujte podporu pro novou kartu."); return; }
 
-      if (pendingCount > 0) {
-        navBadge.textContent = pendingCount;
-        navBadge.classList.remove('hidden');
-        bellDot.classList.remove('hidden');
-      } else {
-        navBadge.classList.add('hidden');
-        bellDot.classList.add('hidden');
-      }
-    }
+    var addCard = e.target.closest("#btn-add-card");
+    if (addCard) { toast("Žádost o novou kartu byla odeslána (demo)."); return; }
 
-    /**
-     * Switch between the 3 bottom tabs ("prehled", "pokyny", "menu")
-     */
-    function switchTab(tabName, focusAccountId = null) {
-      currentTab = tabName;
-      ['prehled', 'pokyny', 'menu'].forEach(name => {
-        const view = document.getElementById(`view-${name}`);
-        const pill = document.getElementById(`nav-pill-${name}`);
-        const icon = document.getElementById(`nav-icon-${name}`);
-        const label = document.getElementById(`nav-label-${name}`);
-
-        if (name === tabName) {
-          view.classList.remove('hidden');
-          view.classList.add('flex');
-          pill.classList.add('bg-[#E6EFFC]');
-          icon.setAttribute('stroke', '#0049A8');
-          label.className = 'text-[11px] font-semibold text-[#0049A8]';
-        } else {
-          view.classList.add('hidden');
-          view.classList.remove('flex');
-          pill.classList.remove('bg-[#E6EFFC]');
-          icon.setAttribute('stroke', '#5A6B82');
-          label.className = 'text-[11px] font-medium text-[#5A6B82]';
-        }
-      });
-
-      if (tabName === 'menu') {
-        renderMenuEditors(focusAccountId);
-      } else if (tabName === 'pokyny') {
-        renderPokyny();
-      } else {
-        renderPrehled();
-      }
-    }
-
-    function openQuickEditFromOverview(accountId) {
-      switchTab('menu', accountId);
-    }
-
-    /**
-     * Manual Balance Editor Actions
-     */
-    function setEditorMode(mode) {
-      editorMode = mode;
-      const addBtn = document.getElementById('btnModeAdd');
-      const setBtn = document.getElementById('btnModeSet');
-
-      if (mode === 'add') {
-        addBtn.className = 'py-1.5 px-2.5 rounded-lg text-[12px] font-semibold bg-[#0049A8] text-white shadow-xs transition';
-        setBtn.className = 'py-1.5 px-2.5 rounded-lg text-[12px] font-semibold text-[#5A6B82] hover:text-[#122236] transition';
-      } else {
-        setBtn.className = 'py-1.5 px-2.5 rounded-lg text-[12px] font-semibold bg-[#0049A8] text-white shadow-xs transition';
-        addBtn.className = 'py-1.5 px-2.5 rounded-lg text-[12px] font-semibold text-[#5A6B82] hover:text-[#122236] transition';
-      }
-      renderMenuEditors();
-    }
-
-    function applyAccountAmount(accountId) {
-      const inp = document.getElementById(`input-acc-${accountId}`);
-      if (!inp) return;
-      const val = parseFloat(String(inp.value).replace(',', '.'));
-      if (isNaN(val) || val < 0) {
-        showToast('Zadejte platnou částku');
-        inp.focus();
-        return;
-      }
-
-      const acc = appState.accounts.find(a => a.id === accountId);
-      if (!acc) return;
-
-      if (editorMode === 'add') {
-        acc.balance = Math.round((acc.balance + val) * 100) / 100;
-        showToast(`Přičteno +${val.toLocaleString('cs-CZ', { minimumFractionDigits: 2 })} Kč`);
-      } else {
-        acc.balance = Math.round(val * 100) / 100;
-        showToast(`Nastaveno ${val.toLocaleString('cs-CZ', { minimumFractionDigits: 2 })} Kč`);
-      }
-
-      saveState();
-      renderAll();
-    }
-
-    function quickAddPreset(accountId, preset) {
-      const acc = appState.accounts.find(a => a.id === accountId);
-      if (!acc) return;
-      acc.balance = Math.round((acc.balance + preset) * 100) / 100;
-      saveState();
-      renderAll();
-      showToast(`+${preset.toLocaleString('cs-CZ')} Kč přidáno`);
-    }
-
-    function zeroSingleAccount(accountId) {
-      const acc = appState.accounts.find(a => a.id === accountId);
-      if (!acc) return;
-      acc.balance = 0;
-      saveState();
-      renderAll();
-      showToast('Účet vynulován (0,00 Kč)');
-    }
-
-    function resetAllBalances() {
-      appState.accounts.forEach(a => a.balance = 0);
-      saveState();
-      renderAll();
-      showToast('Všechny účty vynulovány na 0,00 Kč');
-    }
-
-    function saveManualInputsAndGoOverview() {
-      appState.accounts.forEach(acc => {
-        const inp = document.getElementById(`input-acc-${acc.id}`);
-        if (inp && inp.value.trim() !== '') {
-          const val = parseFloat(String(inp.value).replace(',', '.'));
-          if (!isNaN(val) && val >= 0) {
-            if (editorMode === 'add') {
-              acc.balance = Math.round((acc.balance + val) * 100) / 100;
-            } else {
-              acc.balance = Math.round(val * 100) / 100;
-            }
-          }
-        }
-      });
-
-      saveState();
-      renderAll();
-      switchTab('prehled');
-      showToast('Zůstatky uloženy');
-    }
-
-    /**
-     * File Configuration Upload / Download / Inline JSON
-     */
-    function handleConfigFileUpload(event) {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          applyParsedConfig(parsed);
-          showToast(`Soubor "${file.name}" úspěšně načten`);
-        } catch (err) {
-          showToast('Chyba: Neplatný formát JSON v souboru');
-        }
-        event.target.value = '';
+    var faq = e.target.closest("[data-faq]");
+    if (faq) {
+      var q = faq.querySelector("span").textContent;
+      var answers = {
+        "Jak zablokuji ztracenou kartu?": "Přejděte do sekce Karty, vyberte danou kartu a klikněte na „Zablokovat kartu“. Kartu můžete kdykoliv znovu odblokovat na pobočce.",
+        "Jak změním denní limit?": "V detailu karty použijte tlačítka + a − u denního limitu pro platby. Změna se v této maketě projeví okamžitě.",
+        "Jak funguje QR platba?": "QR kód v sekci Platby zobrazuje náhled platebních údajů přímo v aplikaci. V této maketě nejde o funkční platební odkaz pro externí čtečky."
       };
-      reader.readAsText(file, 'UTF-8');
+      document.getElementById("faq-title").textContent = q;
+      document.getElementById("faq-body").textContent = answers[q] || "";
+      document.getElementById("faq-sheet").hidden = false;
+      return;
     }
 
-    function applyParsedConfig(parsed) {
-      if (!parsed || typeof parsed !== 'object') {
-        throw new Error('Invalid object');
-      }
+    var openSecurity = e.target.closest("#open-security");
+    if (openSecurity) { document.getElementById("security-sheet").hidden = false; return; }
 
-      if (typeof parsed.companyName === 'string' && parsed.companyName.trim()) {
-        appState.companyName = parsed.companyName.trim();
-      }
-
-      // Support either array of accounts or simple key-value balances { acc1: 15000, acc2: 5000 }
-      if (Array.isArray(parsed.accounts)) {
-        parsed.accounts.forEach((incoming, idx) => {
-          const target = appState.accounts.find(a => a.id === incoming.id) || appState.accounts[idx];
-          if (target) {
-            if (incoming.title) target.title = String(incoming.title);
-            if (incoming.owner) target.owner = String(incoming.owner);
-            if (incoming.accountNumber) target.accountNumber = String(incoming.accountNumber);
-            if (incoming.iban) target.iban = String(incoming.iban);
-            if (incoming.balance !== undefined) target.balance = Math.max(0, Number(incoming.balance) || 0);
-          }
-        });
-      } else if (parsed.balances && typeof parsed.balances === 'object') {
-        Object.keys(parsed.balances).forEach(key => {
-          const target = appState.accounts.find(a => a.id === key);
-          if (target) {
-            target.balance = Math.max(0, Number(parsed.balances[key]) || 0);
-          }
-        });
-      }
-
-      if (Array.isArray(parsed.pokyny)) {
-        appState.pokyny = parsed.pokyny.map((p, i) => ({
-          id: p.id || `pokyn_${Date.now()}_${i}`,
-          recipient: p.recipient || 'Obchodní partner s.r.o.',
-          counterAccount: p.counterAccount || '192837465 / 0800',
-          amount: Math.max(0, Number(p.amount) || 0),
-          vs: p.vs || '2026001',
-          date: p.date || 'Dnes',
-          status: p.status === 'done' ? 'done' : 'pending'
-        }));
-      }
-
-      saveState();
-      renderAll();
+    var scanBtn = e.target.closest("#qr-scan-btn");
+    if (scanBtn) {
+      var res = document.getElementById("qr-scan-result");
+      res.hidden = false;
+      res.textContent = "Rozpoznána platba: Kavárna Mlsná Kočka · 95,00 Kč. Potvrďte platbu v sekci Platby.";
+      return;
     }
+  });
 
-    function downloadTemplateJSON() {
-      const dataStr = JSON.stringify(appState, null, 2);
-      const blob = new Blob([dataStr], { type: 'application/json;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'george-business-config.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('Staženo: george-business-config.json');
-    }
-
-    function toggleInlineJsonEditor() {
-      const wrap = document.getElementById('inlineJsonWrapper');
-      const chev = document.getElementById('jsonEditorChevron');
-      const isHidden = wrap.classList.contains('hidden');
-      if (isHidden) {
-        document.getElementById('inlineJsonTextarea').value = JSON.stringify(appState, null, 2);
-        wrap.classList.remove('hidden');
-        chev.classList.add('rotate-180');
+  // toggles (freeze / contactless / online / abroad)
+  document.addEventListener("change", function (e) {
+    var toggle = e.target.closest("[data-toggle]");
+    if (toggle) {
+      var kind = toggle.getAttribute("data-toggle");
+      var detail = toggle.closest(".card-detail");
+      var cardEl = document.querySelector('.bank-card[data-card="' + detail.getAttribute("data-for") + '"]');
+      if (kind === "freeze") {
+        cardEl.classList.toggle("frozen", toggle.checked);
+        cardEl.querySelector(".frozen-flag").hidden = !toggle.checked;
+        var statusBadge = detail.querySelector("[data-status-badge]");
+        statusBadge.textContent = toggle.checked ? "Zmrazeno" : "Aktivní";
+        statusBadge.className = "badge " + (toggle.checked ? "off" : "on");
+        toast(toggle.checked ? "Karta byla zmrazena." : "Karta byla odmrazena.");
       } else {
-        wrap.classList.add('hidden');
-        chev.classList.remove('rotate-180');
+        toast("Nastavení uloženo.");
       }
     }
+  });
 
-    function applyInlineJson() {
-      const raw = document.getElementById('inlineJsonTextarea').value;
-      try {
-        const parsed = JSON.parse(raw);
-        applyParsedConfig(parsed);
-        showToast('JSON konfigurace uložena');
-      } catch (err) {
-        showToast('Chyba syntaxe v JSON textu');
-      }
-    }
+  // limit stepper
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-limit]");
+    if (!btn) return;
+    var valEl = btn.closest(".card").querySelector("[data-limit-value]");
+    var current = parseInt(valEl.textContent.replace(/\D/g, ""), 10) || 0;
+    var step = 5000;
+    current = btn.getAttribute("data-limit") === "+" ? current + step : Math.max(0, current - step);
+    valEl.textContent = current.toLocaleString("cs-CZ") + " Kč";
+  });
 
-    /**
-     * Account Detail Modal (Transakce / Info)
-     */
-    function openAccountDetail(accountId) {
-      const acc = appState.accounts.find(a => a.id === accountId);
-      if (!acc) return;
-      activeDetailAccountId = accountId;
+  // forms
+  document.getElementById("login-form").addEventListener("submit", function (e) { e.preventDefault(); go("home"); });
+  document.getElementById("login-biometric").addEventListener("click", function () { go("home"); });
+  document.getElementById("logout-btn").addEventListener("click", function () { go("login"); });
 
-      document.getElementById('detailAccTitle').textContent = acc.title;
-      document.getElementById('detailAccSub').textContent = `${acc.accountNumber} • ${acc.currency}`;
-      document.getElementById('detailAccBalance').innerHTML = formatCZK(acc.balance);
+  document.getElementById("reg1-form").addEventListener("submit", function (e) { e.preventDefault(); go("register-2"); });
+  document.getElementById("reg2-form").addEventListener("submit", function (e) { e.preventDefault(); go("register-3"); });
+  document.getElementById("reg3-form").addEventListener("submit", function (e) { e.preventDefault(); go("register-4"); });
 
-      document.getElementById('infoTyp').textContent = acc.title;
-      document.getElementById('infoMajitel').textContent = acc.owner;
-      document.getElementById('infoCislo').textContent = acc.accountNumber;
-      document.getElementById('infoIban').textContent = acc.iban;
+  document.getElementById("transfer-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    document.getElementById("transfer-form").hidden = true;
+    document.getElementById("transfer-ok").hidden = false;
+  });
 
-      switchAccountDetailTab('transakce');
-      const modal = document.getElementById('accountDetailModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
+  document.getElementById("pin-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    document.getElementById("security-sheet").hidden = true;
+    toast("PIN byl úspěšně změněn.");
+    e.target.reset();
+  });
 
-    function closeAccountDetail() {
-      const modal = document.getElementById('accountDetailModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
+  document.getElementById("notif-clear").addEventListener("click", function () {
+    document.querySelectorAll("#notif-list .unread").forEach(function (r) { r.classList.remove("unread"); });
+    document.getElementById("notif-dot").style.display = "none";
+    toast("Oznámení označena jako přečtená.");
+  });
 
-    function switchAccountDetailTab(tab) {
-      const btnT = document.getElementById('detailTabTransakce');
-      const btnI = document.getElementById('detailTabInfo');
-      const bodyT = document.getElementById('detailBodyTransakce');
-      const bodyI = document.getElementById('detailBodyInfo');
-
-      if (tab === 'transakce') {
-        btnT.className = 'py-1.5 rounded-lg text-[12.5px] font-semibold bg-white text-[#003781] transition';
-        btnI.className = 'py-1.5 rounded-lg text-[12.5px] font-medium text-white/85 transition';
-        bodyT.classList.remove('hidden');
-        bodyI.classList.add('hidden');
-      } else {
-        btnI.className = 'py-1.5 rounded-lg text-[12.5px] font-semibold bg-white text-[#003781] transition';
-        btnT.className = 'py-1.5 rounded-lg text-[12.5px] font-medium text-white/85 transition';
-        bodyI.classList.remove('hidden');
-        bodyT.classList.add('hidden');
-      }
-    }
-
-    function editAccountFromModal() {
-      const id = activeDetailAccountId;
-      closeAccountDetail();
-      switchTab('menu', id);
-    }
-
-    function createPaymentFromDetail() {
-      const id = activeDetailAccountId;
-      closeAccountDetail();
-      switchTab('menu', id);
-      showToast('Zadejte částku pro úpravu zůstatku');
-    }
-
-    function openCardModal() {
-      showToast('Firemní karta Visa Business •••• 4821 — Aktivní');
-    }
-
-    /**
-     * Pokyny k potvrzení — Filter & Signing Simulation
-     */
-    function setPokynyFilter(filter) {
-      pokynyFilter = filter;
-      ['pending', 'waiting', 'done'].forEach(f => {
-        const btn = document.getElementById(`subtab-${f}`);
-        if (f === filter) {
-          btn.className = 'py-1.5 px-2 rounded-lg text-[12px] font-semibold bg-white text-[#003781] shadow-xs transition';
-        } else {
-          btn.className = 'py-1.5 px-2 rounded-lg text-[12px] font-medium text-white/85 hover:text-white transition';
-        }
-      });
-      renderPokyny();
-    }
-
-    function addSampleInstruction() {
-      const newPokyn = {
-        id: `pokyn_${Date.now()}`,
-        recipient: 'Dodavatel CZ s.r.o.',
-        counterAccount: '482910384 / 0800',
-        amount: 4500,
-        vs: String(Math.floor(100000 + Math.random() * 900000)),
-        date: 'Dnes',
-        status: 'pending'
-      };
-      appState.pokyny.unshift(newPokyn);
-      saveState();
-      setPokynyFilter('pending');
-      updateBadges();
-      showToast('Přidán nový pokyn k podpisu');
-    }
-
-    function openAuthModal(pokynId) {
-      const item = appState.pokyny.find(p => p.id === pokynId);
-      if (!item) return;
-      activeAuthPokynId = pokynId;
-      document.getElementById('authRecipient').textContent = item.recipient;
-      document.getElementById('authCounterAccount').textContent = item.counterAccount;
-      document.getElementById('authAmount').innerHTML = formatCZK(item.amount);
-
-      const modal = document.getElementById('authModal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-    }
-
-    function closeAuthModal() {
-      const modal = document.getElementById('authModal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-      activeAuthPokynId = null;
-    }
-
-    function confirmInstructionAction() {
-      if (!activeAuthPokynId) return;
-      const item = appState.pokyny.find(p => p.id === activeAuthPokynId);
-      if (item) {
-        item.status = 'done';
-        // Deduct from primary account if balance is sufficient
-        const mainAcc = appState.accounts[0];
-        if (mainAcc && mainAcc.balance >= item.amount) {
-          mainAcc.balance = Math.round((mainAcc.balance - item.amount) * 100) / 100;
-        }
-      }
-      closeAuthModal();
-      saveState();
-      renderAll();
-      showToast('Pokyn byl úspěšně podepsán');
-    }
-
-    /**
-     * Toast Feedback
-     */
-    function showToast(msg) {
-      const banner = document.getElementById('toastBanner');
-      banner.textContent = msg;
-      banner.classList.remove('hidden');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        banner.classList.add('hidden');
-      }, 2200);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      renderAll();
+  // otp auto-advance
+  document.querySelectorAll(".otp-row input").forEach(function (inp, i, all) {
+    inp.addEventListener("input", function () {
+      if (inp.value && all[i + 1]) all[i + 1].focus();
     });
-  </script>
-</body>
-</html>
+  });
+
+  window.addEventListener("hashchange", function () {
+    var name = location.hash.replace("#", "");
+    if (screens.indexOf(name) !== -1 || onboardScreens.indexOf(name) !== -1) showScreen(name);
+    else if (!name) showScreen("login");
+  });
+
+  var start = location.hash.replace("#", "");
+  if (screens.indexOf(start) !== -1 || onboardScreens.indexOf(start) !== -1) showScreen(start);
+  else showScreen("login");
+})();
+</script>
+
+</body></html>
