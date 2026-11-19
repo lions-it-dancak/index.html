@@ -1,1 +1,848 @@
-dancak project
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Přehled — Mobilní bankovnictví</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Roboto', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #E2E6ED;
+      margin: 0;
+      padding: 0;
+      color: #1C1E21;
+      overscroll-behavior-y: none;
+    }
+
+    /* Hide scrollbars cleanly while keeping scrollability */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Authentic Czech currency superscript formatting */
+    .czk-sup {
+      font-size: 0.56em;
+      font-weight: 600;
+      vertical-align: super;
+      line-height: 0;
+      margin-left: 1px;
+    }
+
+    .czk-unit {
+      font-size: 0.88em;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    /* Smooth card shadows matching the banking UI */
+    .bank-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05), 0 1px 2px rgba(16, 24, 40, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Colored top accent strip inside rounded card */
+    .card-accent-red {
+      border-top: 3px solid #C8102E;
+    }
+    .card-accent-navy {
+      border-top: 3px solid #1A1F36;
+    }
+    .card-accent-plum {
+      border-top: 3px solid #5B194D;
+    }
+    .card-accent-purple {
+      border-top: 3px solid #6E2563;
+    }
+
+    /* Mobile viewport shell on desktop, full screen on mobile */
+    .app-shell {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100dvh;
+      height: 100dvh;
+      background-color: #F2F4F7;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 480px) {
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 16px 0;
+      }
+      .app-shell {
+        height: 860px;
+        min-height: 860px;
+        max-height: 94vh;
+        border-radius: 32px;
+        box-shadow: 0 24px 60px rgba(11, 73, 181, 0.16), 0 4px 16px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    /* Custom subtle toast animation */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+    .toast-anim {
+      animation: fadeSlideUp 0.22s ease-out forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell" id="appShell">
+    
+    <!-- ========================================================= -->
+    <!-- PAGE 1: MAIN OVERVIEW ("Přehled") - 1:1 VISUAL REPLICATION -->
+    <!-- ========================================================= -->
+    <div id="pageOverview" class="flex flex-col h-full w-full">
+      
+      <!-- Top Royal Blue Header -->
+      <header class="bg-[#0B49B5] text-white px-5 pt-4 pb-3.5 flex items-center justify-between shrink-0 z-20">
+        <h1 class="text-[21px] font-medium tracking-[-0.01em] leading-none">Přehled</h1>
+        
+        <div class="flex items-center space-x-5">
+          <!-- Search Icon -->
+          <button type="button" onclick="showToast('Vyhledávání není v náhledu aktivní')" aria-label="Hledat" class="p-1 rounded-full active:bg-white/15 transition">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7.5"></circle>
+              <line x1="20.5" y1="20.5" x2="16.35" y2="16.35"></line>
+            </svg>
+          </button>
+
+          <!-- Card Icon -->
+          <button type="button" onclick="showToast('Karty jsou aktivní')" aria-label="Karty" class="p-1 rounded-full active:bg-white/15 transition">
+            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="5" width="19" height="14" rx="2.5"></rect>
+              <line x1="2.5" y1="9.5" x2="21.5" y2="9.5"></line>
+              <line x1="6" y1="14.5" x2="10" y2="14.5"></line>
+            </svg>
+          </button>
+
+          <!-- User Profile Icon (Also switches to Editor Page) -->
+          <button type="button" onclick="switchPage('editor')" aria-label="Profil a úprava částek" title="Upravit částky" class="p-1 rounded-full active:bg-white/15 transition relative">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.8"></circle>
+              <path d="M5 19.5c0-3.5 3.1-6 7-6s7 2.5 7 6"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Main Content -->
+      <main class="flex-1 overflow-y-auto no-scrollbar pb-28">
+        
+        <!-- Top Horizontal Summary Cards Row -->
+        <div class="px-4 pt-3 pb-1 flex space-x-3 overflow-x-auto no-scrollbar">
+          
+          <!-- Summary Card 1: Výdaje za ноябрь -->
+          <div onclick="switchPage('editor', 'expenses')" class="bank-card min-w-[218px] w-[58%] shrink-0 px-4 py-3.5 cursor-pointer active:scale-[0.99] transition">
+            <div class="flex items-start justify-between">
+              <span class="text-[13.5px] font-medium text-[#2A2E37] leading-tight">Výdaje za ноябрь</span>
+              <!-- Light blue circular chart icon -->
+              <div class="w-7 h-7 rounded-full bg-[#E8EEF8] flex items-center justify-center shrink-0 ml-2 -mt-0.5">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                  <rect x="2.5" y="8" width="2" height="5.5" rx="1" fill="#0B49B5"/>
+                  <rect x="6.5" y="4" width="2" height="9.5" rx="1" fill="#0B49B5"/>
+                  <rect x="10.5" y="6.5" width="2" height="7" rx="1" fill="#0B49B5"/>
+                </svg>
+              </div>
+            </div>
+            
+            <div id="display-expenses" class="text-[21px] font-bold text-[#1C1E21] tracking-[-0.02em] mt-1 leading-tight">
+              0,<span class="czk-sup">00</span><span class="czk-unit">Kč</span>
+            </div>
+            
+            <div class="text-[11.5px] text-[#667085] mt-1">Rozpočet nenastaven</div>
+          </div>
+
+          <!-- Summary Card 2: Bydlení -->
+          <div onclick="switchPage('editor', 'housing')" class="bank-card min-w-[168px] w-[44%] shrink-0 px-4 py-3.5 cursor-pointer active:scale-[0.99] transition">
+            <div class="flex items-start justify-between">
+              <span class="text-[13.5px] font-medium text-[#2A2E37] leading-tight">Bydlení</span>
+            </div>
+            
+            <div id="display-housing" class="text-[21px] font-bold text-[#1C1E21] tracking-[-0.02em] mt-2.5 leading-tight">
+              0,<span class="czk-sup">00</span><span class="czk-unit">Kč</span>
+            </div>
+            
+            <div class="text-[11.5px] text-transparent select-none mt-1">&nbsp;</div>
+          </div>
+
+        </div>
+
+        <!-- Section Header: Vaše produkty -->
+        <div class="px-5 pt-4 pb-2.5 flex items-center justify-between">
+          <h2 class="text-[13.5px] font-medium text-[#475467]">Vaše produkty</h2>
+        </div>
+
+        <!-- Product Cards List -->
+        <div class="px-4 space-y-3">
+
+          <!-- Product Card 1: Standard účet (Personal / Red top line) -->
+          <div class="bank-card card-accent-red px-4 pt-3.5 pb-3.5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-[15.5px] font-semibold text-[#1C1E21] leading-snug">Standard účet</div>
+              </div>
+              <!-- Red banknote icon badge -->
+              <div class="w-9 h-7 rounded-lg bg-[#FCECEE] flex items-center justify-center shrink-0">
+                <svg width="20" height="14" viewBox="0 0 22 15" fill="none" stroke="#C8102E" stroke-width="1.6">
+                  <rect x="1.2" y="1.2" width="19.6" height="12.6" rx="2"></rect>
+                  <circle cx="11" cy="7.5" r="2.4"></circle>
+                  <line x1="4.2" y1="4.5" x2="4.2" y2="10.5" stroke-linecap="round"></line>
+                  <line x1="17.8" y1="4.5" x2="17.8" y2="10.5" stroke-linecap="round"></line>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Balance -->
+            <div id="display-acc1" class="text-[25px] font-bold text-[#1C1E21] tracking-[-0.02em] mt-1.5 mb-3 leading-none">
+              0,<span class="czk-sup">00</span><span class="czk-unit">Kč</span>
+            </div>
+
+            <!-- Card Footer Actions -->
+            <div class="flex items-center justify-between pt-0.5">
+              <button type="button" onclick="switchPage('editor', 'acc1')" class="bg-[#EAEFF7] hover:bg-[#DFE7F4] active:bg-[#D4DFEE] text-[#1D3B6E] text-[12.5px] font-semibold px-4 py-1.5 rounded-full transition">
+                Nová platba
+              </button>
+              <button type="button" onclick="switchPage('editor', 'acc1')" aria-label="Možnosti účtu" class="p-1.5 text-[#344054] rounded-full hover:bg-gray-100">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="1.75"></circle>
+                  <circle cx="12" cy="12" r="1.75"></circle>
+                  <circle cx="12" cy="19" r="1.75"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Card 2: Standard účet - Václav Tarant -->
+          <div class="bank-card card-accent-navy px-4 pt-3.5 pb-3.5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-[15.5px] font-semibold text-[#1C1E21] leading-snug">Standard účet</div>
+                <div class="text-[13px] text-[#667085] mt-0.5">Václav Tarant</div>
+              </div>
+              <!-- Neutral dark banknote icon badge -->
+              <div class="w-9 h-7 rounded-lg bg-[#F2F4F7] flex items-center justify-center shrink-0">
+                <svg width="20" height="14" viewBox="0 0 22 15" fill="none" stroke="#344054" stroke-width="1.6">
+                  <rect x="1.2" y="1.2" width="19.6" height="12.6" rx="2"></rect>
+                  <circle cx="11" cy="7.5" r="2.4"></circle>
+                  <line x1="4.2" y1="4.5" x2="4.2" y2="10.5" stroke-linecap="round"></line>
+                  <line x1="17.8" y1="4.5" x2="17.8" y2="10.5" stroke-linecap="round"></line>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Balance -->
+            <div id="display-acc2" class="text-[25px] font-bold text-[#1C1E21] tracking-[-0.02em] mt-2 mb-3 leading-none">
+              0,<span class="czk-sup">00</span><span class="czk-unit">Kč</span>
+            </div>
+
+            <!-- Card Footer Actions -->
+            <div class="flex items-center justify-between pt-0.5">
+              <button type="button" onclick="switchPage('editor', 'acc2')" class="bg-[#EAEFF7] hover:bg-[#DFE7F4] active:bg-[#D4DFEE] text-[#1D3B6E] text-[12.5px] font-semibold px-4 py-1.5 rounded-full transition">
+                Nová platba
+              </button>
+              <button type="button" onclick="switchPage('editor', 'acc2')" aria-label="Možnosti účtu" class="p-1.5 text-[#344054] rounded-full hover:bg-gray-100">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="1.75"></circle>
+                  <circle cx="12" cy="12" r="1.75"></circle>
+                  <circle cx="12" cy="19" r="1.75"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Card 3: Plus účet - Marcela Tarantová, st. -->
+          <div class="bank-card card-accent-plum px-4 pt-3.5 pb-3.5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-[15.5px] font-semibold text-[#1C1E21] leading-snug">Plus účet</div>
+                <div class="text-[13px] text-[#667085] mt-0.5">Marcela Tarantová, st.</div>
+              </div>
+              <!-- Neutral dark banknote icon badge -->
+              <div class="w-9 h-7 rounded-lg bg-[#F2F4F7] flex items-center justify-center shrink-0">
+                <svg width="20" height="14" viewBox="0 0 22 15" fill="none" stroke="#344054" stroke-width="1.6">
+                  <rect x="1.2" y="1.2" width="19.6" height="12.6" rx="2"></rect>
+                  <circle cx="11" cy="7.5" r="2.4"></circle>
+                  <line x1="4.2" y1="4.5" x2="4.2" y2="10.5" stroke-linecap="round"></line>
+                  <line x1="17.8" y1="4.5" x2="17.8" y2="10.5" stroke-linecap="round"></line>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Balance -->
+            <div id="display-acc3" class="text-[25px] font-bold text-[#1C1E21] tracking-[-0.02em] mt-2 mb-3 leading-none">
+              0,<span class="czk-sup">00</span><span class="czk-unit">Kč</span>
+            </div>
+
+            <!-- Card Footer Actions -->
+            <div class="flex items-center justify-between pt-0.5">
+              <button type="button" onclick="switchPage('editor', 'acc3')" class="bg-[#EAEFF7] hover:bg-[#DFE7F4] active:bg-[#D4DFEE] text-[#1D3B6E] text-[12.5px] font-semibold px-4 py-1.5 rounded-full transition">
+                Nová platba
+              </button>
+              <button type="button" onclick="switchPage('editor', 'acc3')" aria-label="Možnosti účtu" class="p-1.5 text-[#344054] rounded-full hover:bg-gray-100">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="1.75"></circle>
+                  <circle cx="12" cy="12" r="1.75"></circle>
+                  <circle cx="12" cy="19" r="1.75"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Card 4: Odměny Moneyback (Bottom peek card) -->
+          <div class="bank-card card-accent-purple px-4 pt-3.5 pb-4">
+            <div class="flex items-center justify-between">
+              <div class="text-[15.5px] font-semibold text-[#1C1E21]">Odměny Moneyback</div>
+              <div class="w-9 h-7 rounded-lg bg-[#F9ECF6] flex items-center justify-center shrink-0">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7A1C68" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 7h12l1 12H5L6 7z"></path>
+                  <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- Floating Action Button (FAB) — Opens Balance Editor -->
+      <button type="button" onclick="switchPage('editor')" aria-label="Upravit částky" title="Přidat / upravit částky"
+        class="absolute right-4 bottom-[78px] w-[52px] h-[52px] rounded-full bg-[#0B49B5] hover:bg-[#093E9C] active:scale-95 text-white shadow-[0_6px_16px_rgba(11,73,181,0.4)] flex items-center justify-center transition z-30">
+        <!-- Four-point AI/Sparkle icon matching screenshot -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M10.5 3.5L12.1 8.4L17 10L12.1 11.6L10.5 16.5L8.9 11.6L4 10L8.9 8.4L10.5 3.5Z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/>
+          <path d="M18.2 14.5L18.9 16.6L21 17.3L18.9 18L18.2 20.1L17.5 18L15.4 17.3L17.5 16.6L18.2 14.5Z" fill="white"/>
+        </svg>
+      </button>
+
+      <!-- Fixed Bottom Navigation Bar (5 Tabs) -->
+      <nav class="bg-[#F8F9FB] border-t border-[#E4E7EC] px-2 pt-1.5 pb-2 flex items-center justify-around shrink-0 z-20">
+        
+        <!-- Tab 1: Přehled (Active) -->
+        <button type="button" onclick="switchPage('overview')" class="flex flex-col items-center justify-center w-1/5 py-0.5 group">
+          <div class="w-14 h-7 rounded-full bg-[#DCE5F5] flex items-center justify-center mb-0.5">
+            <!-- Custom stylized "g / 9" banking emblem -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="11.5" cy="10" r="4.5" stroke="#0B49B5" stroke-width="2.3"/>
+              <path d="M16 10v4.5c0 2.5-1.8 4.2-4.3 4.2" stroke="#0B49B5" stroke-width="2.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="text-[11px] font-semibold text-[#0B49B5]">Přehled</span>
+        </button>
+
+        <!-- Tab 2: FIT -->
+        <button type="button" onclick="showToast('Sekce FIT')" class="flex flex-col items-center justify-center w-1/5 py-0.5 relative">
+          <div class="w-14 h-7 rounded-full flex items-center justify-center mb-0.5 relative">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="1.75" stroke-linecap="round">
+              <path d="M4 18C4 11.3726 9.37258 6 16 6" />
+              <path d="M8 18C8 13.5817 11.5817 10 16 10" />
+              <path d="M12 18C12 15.7909 13.7909 14 16 14" />
+            </svg>
+            <span class="w-2 h-2 rounded-full bg-[#D92D20] absolute top-1 right-3.5"></span>
+          </div>
+          <span class="text-[11px] font-medium text-[#475467]">FIT</span>
+        </button>
+
+        <!-- Tab 3: Investice -->
+        <button type="button" onclick="showToast('Sekce Investice')" class="flex flex-col items-center justify-center w-1/5 py-0.5 relative">
+          <div class="w-14 h-7 rounded-full flex items-center justify-center mb-0.5 relative">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 16 8.5 10.5 12.5 14 19.5 6.5"></polyline>
+            </svg>
+            <span class="w-2 h-2 rounded-full bg-[#D92D20] absolute top-1 right-3.5"></span>
+          </div>
+          <span class="text-[11px] font-medium text-[#475467]">Investice</span>
+        </button>
+
+        <!-- Tab 4: Extra (Navigates to Page 2: Balance Editor) -->
+        <button type="button" onclick="switchPage('editor')" class="flex flex-col items-center justify-center w-1/5 py-0.5">
+          <div class="w-14 h-7 rounded-full hover:bg-gray-200/60 flex items-center justify-center mb-0.5 transition">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="4" width="6" height="6" rx="1.2"></rect>
+              <rect x="14" y="4" width="6" height="6" rx="1.2"></rect>
+              <rect x="4" y="14" width="6" height="6" rx="1.2"></rect>
+              <line x1="17" y1="14" x2="17" y2="20"></line>
+              <line x1="14" y1="17" x2="20" y2="17"></line>
+            </svg>
+          </div>
+          <span class="text-[11px] font-medium text-[#475467]">Extra</span>
+        </button>
+
+        <!-- Tab 5: Kontakty -->
+        <button type="button" onclick="showToast('Sekce Kontakty')" class="flex flex-col items-center justify-center w-1/5 py-0.5">
+          <div class="w-14 h-7 rounded-full flex items-center justify-center mb-0.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 6.5h14a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H9l-4.5 3.5V8A1.5 1.5 0 0 1 6 6.5z"></path>
+            </svg>
+          </div>
+          <span class="text-[11px] font-medium text-[#475467]">Kontakty</span>
+        </button>
+
+      </nav>
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- PAGE 2: BALANCE EDITOR & ADDITION MODE ("Upravit částky")  -->
+    <!-- ========================================================= -->
+    <div id="pageEditor" class="hidden flex-col h-full w-full bg-[#F2F4F7]">
+      
+      <!-- Top Royal Blue Header -->
+      <header class="bg-[#0B49B5] text-white px-4 pt-4 pb-3.5 flex items-center justify-between shrink-0 z-20">
+        <div class="flex items-center space-x-2.5">
+          <button type="button" onclick="switchPage('overview')" aria-label="Zpět na Přehled" class="p-1.5 -ml-1 rounded-full active:bg-white/15 transition">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          <h1 class="text-[19px] font-medium tracking-[-0.01em]">Správa zůstatků</h1>
+        </div>
+
+        <button type="button" onclick="resetAllBalances()" class="text-[12.5px] font-medium bg-white/15 hover:bg-white/25 active:bg-white/30 px-3 py-1.5 rounded-full transition">
+          Vynulovat vše
+        </button>
+      </header>
+
+      <!-- Mode Switcher Bar (Add vs Set Exact) -->
+      <div class="bg-white border-b border-[#E4E7EC] px-4 py-3 shrink-0">
+        <div class="bg-[#F2F4F7] p-1 rounded-xl grid grid-cols-2 gap-1">
+          <button type="button" id="modeAddBtn" onclick="setEditorMode('add')"
+            class="py-2 px-3 rounded-lg text-[13px] font-semibold bg-[#0B49B5] text-white shadow-sm transition">
+            + Přičíst částku
+          </button>
+          <button type="button" id="modeSetBtn" onclick="setEditorMode('set')"
+            class="py-2 px-3 rounded-lg text-[13px] font-semibold text-[#475467] hover:text-[#1C1E21] transition">
+            = Nastavit přesně
+          </button>
+        </div>
+        <p id="modeHelperText" class="text-[11.5px] text-[#667085] mt-2 text-center">
+          Zadejte částku a klikněte na <strong>Přidat</strong> — přičte se ke stávajícímu zůstatku.
+        </p>
+      </div>
+
+      <!-- Scrollable Editor Cards -->
+      <main class="flex-1 overflow-y-auto no-scrollbar px-4 pt-3.5 pb-28 space-y-3" id="editorScrollContainer">
+        
+        <!-- Dynamic Editor Cards injected here by JS -->
+        <div id="editorCardsList" class="space-y-3"></div>
+
+      </main>
+
+      <!-- Bottom Action Footer -->
+      <div class="bg-white border-t border-[#E4E7EC] px-4 py-3 shrink-0 z-20 space-y-2">
+        <button type="button" onclick="saveAndReturn()"
+          class="w-full py-3 rounded-xl bg-[#0B49B5] hover:bg-[#093E9C] active:scale-[0.99] text-white font-semibold text-[15px] shadow-md transition flex items-center justify-center space-x-2">
+          <span>Hotovo — zobrazit Přehled</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Subtle Floating Notification Toast -->
+    <div id="toastBanner" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 bg-[#1C1E21]/92 text-white text-[13px] font-medium px-4 py-2 rounded-full shadow-lg z-50 whitespace-nowrap toast-anim">
+      Uloženo
+    </div>
+
+  </div>
+
+  <script>
+    /**
+     * Data structure & initial zeroed state
+     * All balances start strictly at 0.00 Kč as requested.
+     */
+    const STORAGE_KEY = 'cz_bank_app_balances_v1';
+
+    const DEFAULT_BALANCES = {
+      expenses: 0, // Výdaje za ноябрь
+      housing: 0,  // Bydlení
+      acc1: 0,     // Standard účet (osobní)
+      acc2: 0,     // Standard účet - Václav Tarant
+      acc3: 0      // Plus účet - Marcela Tarantová, st.
+    };
+
+    const ACCOUNT_META = [
+      {
+        id: 'acc1',
+        title: 'Standard účet',
+        subtitle: 'Osobní účet',
+        accentClass: 'card-accent-red',
+        isAccount: true
+      },
+      {
+        id: 'acc2',
+        title: 'Standard účet',
+        subtitle: 'Václav Tarant',
+        accentClass: 'card-accent-navy',
+        isAccount: true
+      },
+      {
+        id: 'acc3',
+        title: 'Plus účet',
+        subtitle: 'Marcela Tarantová, st.',
+        accentClass: 'card-accent-plum',
+        isAccount: true
+      },
+      {
+        id: 'expenses',
+        title: 'Výdaje za ноябрь',
+        subtitle: 'Měsíční přehled výdajů',
+        accentClass: '',
+        isAccount: false
+      },
+      {
+        id: 'housing',
+        title: 'Bydlení',
+        subtitle: 'Kategorie výdajů',
+        accentClass: '',
+        isAccount: false
+      }
+    ];
+
+    let balances = loadBalances();
+    let editorMode = 'add'; // 'add' | 'set'
+    let toastTimeout = null;
+
+    /**
+     * Load saved balances from localStorage or default to 0
+     */
+    function loadBalances() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { ...DEFAULT_BALANCES };
+        const parsed = JSON.parse(raw);
+        return {
+          expenses: Number(parsed.expenses) || 0,
+          housing: Number(parsed.housing) || 0,
+          acc1: Number(parsed.acc1) || 0,
+          acc2: Number(parsed.acc2) || 0,
+          acc3: Number(parsed.acc3) || 0
+        };
+      } catch (e) {
+        return { ...DEFAULT_BALANCES };
+      }
+    }
+
+    /**
+     * Save balances to localStorage
+     */
+    function persistBalances() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(balances));
+      } catch (e) {
+        console.warn('Storage unavailable', e);
+      }
+    }
+
+    /**
+     * Format number in authentic Czech bank format:
+     * Space as thousands separator, comma, superscript 2-digit decimals, and "Kč"
+     * Example: 20919.2 -> 20 919,<span class="czk-sup">20</span><span class="czk-unit">Kč</span>
+     */
+    function formatCzechCurrencyHTML(amount) {
+      const safeAmount = Math.max(0, Number(amount) || 0);
+      const fixed = safeAmount.toFixed(2);
+      const [intPart, decPart] = fixed.split('.');
+      const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+      return `${formattedInt},<span class="czk-sup">${decPart}</span><span class="czk-unit">Kč</span>`;
+    }
+
+    /**
+     * Render all balances onto Page 1 ("Přehled")
+     */
+    function renderOverview() {
+      // Top summary cards
+      document.getElementById('display-expenses').innerHTML = formatCzechCurrencyHTML(balances.expenses);
+      document.getElementById('display-housing').innerHTML = formatCzechCurrencyHTML(balances.housing);
+
+      // Account cards (green text when > 0, dark text when 0)
+      ['acc1', 'acc2', 'acc3'].forEach(id => {
+        const el = document.getElementById(`display-${id}`);
+        const val = balances[id];
+        el.innerHTML = formatCzechCurrencyHTML(val);
+        if (val > 0) {
+          el.classList.remove('text-[#1C1E21]');
+          el.classList.add('text-[#1D6F42]');
+        } else {
+          el.classList.remove('text-[#1D6F42]');
+          el.classList.add('text-[#1C1E21]');
+        }
+      });
+    }
+
+    /**
+     * Render interactive editor cards on Page 2
+     */
+    function renderEditorCards(focusId = null) {
+      const container = document.getElementById('editorCardsList');
+      container.innerHTML = '';
+
+      ACCOUNT_META.forEach(item => {
+        const currentVal = balances[item.id];
+        const isPositiveAccount = item.isAccount && currentVal > 0;
+        const valColorClass = isPositiveAccount ? 'text-[#1D6F42]' : 'text-[#1C1E21]';
+        const btnLabel = editorMode === 'add' ? 'Přidat' : 'Uložit';
+
+        const card = document.createElement('div');
+        card.id = `editor-card-${item.id}`;
+        card.className = `bank-card ${item.accentClass} p-4 transition-all`;
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between mb-2.5">
+            <div>
+              <div class="text-[15px] font-semibold text-[#1C1E21]">${item.title}</div>
+              <div class="text-[12px] text-[#667085]">${item.subtitle}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10.5px] uppercase tracking-wider text-[#667085] font-medium">Aktuálně</div>
+              <div id="editor-current-${item.id}" class="text-[18px] font-bold ${valColorClass} leading-tight">
+                ${formatCzechCurrencyHTML(currentVal)}
+              </div>
+            </div>
+          </div>
+
+          <!-- Input Row -->
+          <div class="flex items-center space-x-2 mt-2">
+            <div class="relative flex-1">
+              <input
+                type="number"
+                inputmode="decimal"
+                step="0.01"
+                min="0"
+                id="input-${item.id}"
+                placeholder="${editorMode === 'add' ? 'Částka k přičtení...' : 'Nový zůstatek...'}"
+                onkeydown="if(event.key==='Enter') applyAmount('${item.id}')"
+                class="w-full bg-[#F8F9FB] border border-[#D0D5DD] focus:border-[#0B49B5] focus:bg-white rounded-xl pl-3.5 pr-9 py-2.5 text-[15px] font-medium text-[#1C1E21] outline-none transition"
+              />
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] font-semibold text-[#667085]">Kč</span>
+            </div>
+
+            <button
+              type="button"
+              onclick="applyAmount('${item.id}')"
+              class="bg-[#0B49B5] hover:bg-[#093E9C] active:scale-95 text-white text-[13.5px] font-semibold px-4 py-2.5 rounded-xl shrink-0 transition">
+              ${btnLabel}
+            </button>
+
+            <button
+              type="button"
+              onclick="zeroSingleBalance('${item.id}')"
+              title="Vynulovat tento účet"
+              class="bg-[#F2F4F7] hover:bg-[#E4E7EC] active:scale-95 text-[#475467] text-[12px] font-semibold px-2.5 py-2.5 rounded-xl shrink-0 transition">
+              0
+            </button>
+          </div>
+
+          <!-- Quick Preset Chips -->
+          <div class="flex items-center gap-1.5 mt-2.5 overflow-x-auto no-scrollbar">
+            ${[100, 500, 1000, 5000, 10000].map(preset => `
+              <button
+                type="button"
+                onclick="quickPreset('${item.id}', ${preset})"
+                class="text-[11.5px] font-medium bg-[#EAEFF7] hover:bg-[#DCE5F5] active:bg-[#CBD8F0] text-[#0B49B5] px-2.5 py-1 rounded-full shrink-0 transition">
+                +${preset.toLocaleString('cs-CZ')} Kč
+              </button>
+            `).join('')}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      if (focusId) {
+        setTimeout(() => {
+          const targetCard = document.getElementById(`editor-card-${focusId}`);
+          const targetInput = document.getElementById(`input-${focusId}`);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.add('ring-2', 'ring-[#0B49B5]');
+            setTimeout(() => targetCard.classList.remove('ring-2', 'ring-[#0B49B5]'), 1400);
+          }
+          if (targetInput) targetInput.focus();
+        }, 80);
+      }
+    }
+
+    /**
+     * Switch between "Add" (+ Přičíst částku) and "Set" (= Nastavit přesně) modes
+     */
+    function setEditorMode(mode) {
+      editorMode = mode;
+      const addBtn = document.getElementById('modeAddBtn');
+      const setBtn = document.getElementById('modeSetBtn');
+      const helper = document.getElementById('modeHelperText');
+
+      if (mode === 'add') {
+        addBtn.className = 'py-2 px-3 rounded-lg text-[13px] font-semibold bg-[#0B49B5] text-white shadow-sm transition';
+        setBtn.className = 'py-2 px-3 rounded-lg text-[13px] font-semibold text-[#475467] hover:text-[#1C1E21] transition';
+        helper.innerHTML = 'Zadejte částku a klikněte na <strong>Přidat</strong> — přičte se ke stávajícímu zůstatku.';
+      } else {
+        setBtn.className = 'py-2 px-3 rounded-lg text-[13px] font-semibold bg-[#0B49B5] text-white shadow-sm transition';
+        addBtn.className = 'py-2 px-3 rounded-lg text-[13px] font-semibold text-[#475467] hover:text-[#1C1E21] transition';
+        helper.innerHTML = 'Zadejte přesnou cílovou částku a klikněte na <strong>Uložit</strong>.';
+      }
+
+      renderEditorCards();
+    }
+
+    /**
+     * Apply input value to a specific account or expense category
+     */
+    function applyAmount(id) {
+      const input = document.getElementById(`input-${id}`);
+      if (!input) return;
+
+      const rawVal = parseFloat(String(input.value).replace(',', '.'));
+      if (isNaN(rawVal) || rawVal < 0) {
+        showToast('Zadejte platnou částku');
+        input.focus();
+        return;
+      }
+
+      if (editorMode === 'add') {
+        balances[id] = Math.round((balances[id] + rawVal) * 100) / 100;
+        showToast(`Přičteno +${rawVal.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč`);
+      } else {
+        balances[id] = Math.round(rawVal * 100) / 100;
+        showToast(`Nastaveno ${rawVal.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Kč`);
+      }
+
+      persistBalances();
+      renderOverview();
+      renderEditorCards();
+    }
+
+    /**
+     * Quick preset chip click (+100, +500, +1000, etc.)
+     */
+    function quickPreset(id, presetAmount) {
+      balances[id] = Math.round((balances[id] + presetAmount) * 100) / 100;
+      persistBalances();
+      renderOverview();
+      renderEditorCards();
+      showToast(`+${presetAmount.toLocaleString('cs-CZ')} Kč přidáno`);
+    }
+
+    /**
+     * Reset a single account to 0,00 Kč
+     */
+    function zeroSingleBalance(id) {
+      balances[id] = 0;
+      persistBalances();
+      renderOverview();
+      renderEditorCards();
+      showToast('Vynulováno na 0,00 Kč');
+    }
+
+    /**
+     * Reset all balances back to 0,00 Kč
+     */
+    function resetAllBalances() {
+      balances = { ...DEFAULT_BALANCES };
+      persistBalances();
+      renderOverview();
+      renderEditorCards();
+      showToast('Všechny účty vynulovány (0,00 Kč)');
+    }
+
+    /**
+     * Save any pending typed values in inputs and switch to Overview
+     */
+    function saveAndReturn() {
+      ACCOUNT_META.forEach(item => {
+        const input = document.getElementById(`input-${item.id}`);
+        if (input && input.value.trim() !== '') {
+          const val = parseFloat(String(input.value).replace(',', '.'));
+          if (!isNaN(val) && val >= 0) {
+            if (editorMode === 'add') {
+              balances[item.id] = Math.round((balances[item.id] + val) * 100) / 100;
+            } else {
+              balances[item.id] = Math.round(val * 100) / 100;
+            }
+          }
+        }
+      });
+
+      persistBalances();
+      renderOverview();
+      switchPage('overview');
+      showToast('Změny uloženy');
+    }
+
+    /**
+     * Navigate between Page 1 (Overview) and Page 2 (Editor)
+     */
+    function switchPage(pageName, focusId = null) {
+      const overview = document.getElementById('pageOverview');
+      const editor = document.getElementById('pageEditor');
+
+      if (pageName === 'editor') {
+        overview.classList.add('hidden');
+        editor.classList.remove('hidden');
+        editor.classList.add('flex');
+        renderEditorCards(focusId);
+      } else {
+        editor.classList.add('hidden');
+        editor.classList.remove('flex');
+        overview.classList.remove('hidden');
+        renderOverview();
+      }
+    }
+
+    /**
+     * Non-intrusive mobile toast feedback
+     */
+    function showToast(message) {
+      const toast = document.getElementById('toastBanner');
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2100);
+    }
+
+    // Initialize UI on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderOverview();
+    });
+  </script>
+</body>
+</html>
